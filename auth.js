@@ -2,7 +2,8 @@
 // Uses Firebase Authentication (Google, or email + password). Does nothing until firebase-config.js is filled in.
 (function () {
   const cfg = window.FIREBASE_CONFIG;
-  const onLogin = location.pathname.endsWith("/login.html");
+  // Cloudflare Pages serves login.html as /login, so accept both.
+  const onLogin = /\/login(\.html)?\/?$/.test(location.pathname);
   if (!cfg || !cfg.apiKey) return;
 
   // Hide the page until we know who is visiting, so nothing flashes before the redirect.
@@ -20,7 +21,7 @@
 
   const safeNext = () => {
     const n = new URLSearchParams(location.search).get("next") || "";
-    return /^[\w.\-]+\.html([?#].*)?$/.test(n) ? n : "index.html";
+    return /^[\w\-]+(\.html)?([?#].*)?$/.test(n) ? n : "index.html";
   };
 
   window.Auth = {
@@ -59,7 +60,7 @@
         return;
       }
       if (!user) {
-        const here = location.pathname.split("/").pop() + location.search + location.hash;
+        const here = (location.pathname.split("/").pop() || "index.html") + location.search + location.hash;
         location.replace("login.html?next=" + encodeURIComponent(here));
         return;
       }
