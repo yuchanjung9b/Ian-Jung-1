@@ -17,7 +17,17 @@ const ASSUMPTIONS = {
     bus: { label: "Intercity bus + local bus", local: 8000, leg: 28000, extraStops: 0 },
     car: { label: "Rental car", localCar: 100000, legCar: 30000, extraStops: 1 },
     taxi: { label: "Taxi / private driver", localCar: 70000, legCar: 130000, extraStops: 0 },
+    flight: { label: "Domestic flights + subway", local: 10000, leg: 80000, extraStops: 0 },
   },
+};
+
+// Typical economy round-trip fares per person to Seoul (Incheon), in KRW. Rough estimates, prices vary a lot by season.
+const ORIGINS = {
+  none: { label: "I am already in Korea", cost: 0 },
+  asia: { label: "Asia (Japan, China, Southeast Asia)", cost: 500000 },
+  oceania: { label: "Australia or New Zealand", cost: 1300000 },
+  europe: { label: "Europe", cost: 1400000 },
+  namerica: { label: "North America", cost: 1700000 },
 };
 
 const TIERS = ["Budget", "Mid-range", "Luxury"];
@@ -132,7 +142,7 @@ function build(theme, opts, tier, freeBias, rand) {
 
   const base = Math.floor(days / regions.length);
   const extra = days % regions.length;
-  const totals = { lodging: 0, food: 0, sights: 0, transport: 0 };
+  const totals = { flights: ORIGINS[opts.origin].cost, lodging: 0, food: 0, sights: 0, transport: 0 };
   const segments = [];
 
   regions.forEach((prov, idx) => {
@@ -181,7 +191,7 @@ function build(theme, opts, tier, freeBias, rand) {
     totals.transport += flight ? ASSUMPTIONS.flight : tr.leg ?? (tr.legCar * cars) / people;
   }
 
-  const total = totals.lodging + totals.food + totals.sights + totals.transport;
+  const total = totals.flights + totals.lodging + totals.food + totals.sights + totals.transport;
   return { theme, tier, freeBias, segments, totals, total, legs };
 }
 
@@ -209,6 +219,7 @@ function transportTips(opts) {
     ktx: "Book KTX seats in the Korail app or at the station. A T-money card works on subways and buses everywhere.",
     bus: "Intercity buses are cheaper than KTX and go to smaller towns. Buy tickets at the terminal or on the Kobus site.",
     car: "Rental cars need an International Driving Permit. Use Naver Map or Kakao Map for navigation, and keep some cash or a Hi-Pass card for tolls.",
+    flight: "Domestic flights (Gimpo, Gimhae, Jeju and other airports) are quick for long distances. Book early on Korean low-cost airlines and allow time for airport transfers.",
     taxi: "Use the Kakao T app to call taxis. Private drivers can be booked for a full day and are the easiest option for older travelers.",
   };
   return tips[opts.mode];
@@ -225,6 +236,7 @@ function ageTip(age) {
 function renderPlan(plan, opts, i) {
   const t = plan.totals;
   const rows = [
+    ...(t.flights ? [["International flight", t.flights]] : []),
     ["Hotels", t.lodging],
     ["Food", t.food],
     ["Sights", t.sights],
@@ -265,7 +277,7 @@ function renderPlan(plan, opts, i) {
   return `
     <article class="plan">
       <header class="plan-head">
-        <p class="plan-no">Plan ${i + 1}</p>
+        <p class="plan-no">Plan ${i + 1}${plan.recommended ? ` <span class="pick">★ Recommended for you</span>` : ""}</p>
         <h3>${esc(plan.theme.name)}</h3>
         <p>${esc(plan.theme.blurb)}</p>
         <p class="plan-total">${money(plan.total)} <small>per person</small></p>
@@ -291,6 +303,7 @@ function generate() {
     days: Math.min(14, Math.max(1, Number(data.get("days")) || 1)),
     budget: Math.max(100, Number(data.get("budget")) || 100),
     mode: data.get("mode"),
+    origin: data.get("origin") in ORIGINS ? data.get("origin") : "none",
   };
   let regions = regionIds.map((id) => PROVINCES.find((p) => p.id === id));
   let notice = "";
@@ -300,16 +313,28 @@ function generate() {
   }
   opts.regions = regions;
   const plans = THEMES.map((theme, i) => makePlan(theme, opts, seed * 100 + i + 1));
+
+  // Recommend the plan that stays within budget and uses it best; if none fits, the cheapest one.
+  const fitting = plans.filter((x) => x.fits);
+  const best = fitting.length
+    ? fitting.reduce((a, b) => (b.total > a.total ? b : a))
+    : plans.reduce((a, b) => (b.total < a.total ? b : a));
+  best.recommended = true;
+  plans.sort((a, b) => Number(!!b.recommended) - Number(!!a.recommended));
+  const why = fitting.length
+    ? `${best.theme.name} stays within your budget and makes the most of it.`
+    : `Nothing fits this budget, so ${best.theme.name} is the closest. Try fewer days or a higher budget.`;
   results.innerHTML = `
     ${notice}
-    <p class="tips">${regions.some((r) => r.id === "jeju") ? "✈️ Jeju is reached by plane. Flights are counted in transport here. " : ""}🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.age))}</p>
+    <p class="tips">⭐ ${esc(why)}<br />${opts.origin !== "none" ? `🌏 Includes an estimated ${money(ORIGINS[opts.origin].cost)} per person for flights from ${esc(ORIGINS[opts.origin].label)}.<br />` : ""}${regions.some((r) => r.id === "jeju") ? "✈️ Jeju is reached by plane, and that flight is counted in transport.<br />" : ""}🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.age))}</p>
     <div class="plan-grid">${plans.map((p, i) => renderPlan(p, opts, i)).join("")}</div>
     <p class="actions">
       <button type="button" id="again" class="button button-dark">Show me different plans</button>
       <button type="button" id="print" class="button button-dark">Print</button>
     </p>
     <p class="note">Estimates only. Hotels are priced per room (two people share), meals use the average listed price,
-    and transport uses typical fares (${esc(ASSUMPTIONS.transport[opts.mode].label)}). Flights are not included.
+    and transport uses typical fares (${esc(ASSUMPTIONS.transport[opts.mode].label)}).
+    ${opts.origin === "none" ? "International flights are not included." : "The international flight is an average fare and varies by season."}
     Exchange rate ₩${KRW_PER_USD.toLocaleString()} = $1. Check prices before you go.</p>`;
   document.getElementById("again").addEventListener("click", () => {
     seed++;
