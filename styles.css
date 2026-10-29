@@ -1038,3 +1038,14 @@ html {
 .map a:hover circle {
   stroke: var(--ink);
 }
+
+.city-link {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+.city-link:hover b {
+  color: var(--blue);
+  text-decoration: underline;
+}

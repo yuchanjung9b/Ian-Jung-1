@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>한반도 · Provinces and Cities of South Korea</title>
     <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
-    <link rel="stylesheet" href="styles.css?v=14" />
+    <link rel="stylesheet" href="styles.css?v=15" />
   </head>
   <body>
     <nav class="nav">
       <div class="wrap">
         <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
-        <span class="nav-links"><a href="index.html">Home</a> <a href="hanbando.html">한반도</a></span>
+        <span class="nav-links"><a href="index.html">Home</a> <a href="guide.html">Guide</a> <a href="hanbando.html">한반도</a></span>
       </div>
     </nav>
 
@@ -61,8 +61,10 @@
       // Location line: approximate coordinates plus a map link.
       const where = (lat, lng) =>
         `<span class="loc">📍 ${lat.toFixed(2)}°N ${lng.toFixed(2)}°E · <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" rel="noopener">Map</a></span>`;
-      const city = (en, ko, lat, lng, extra = "") =>
-        `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span>${extra}${where(lat, lng)}</li>`;
+      // Each city name opens that city's attractions, 맛집, places to stay and local food in the guide.
+      const slug = (n) => n.replace(/ \(.*\)/, "").toLowerCase().replace(/\s+/g, "-");
+      const city = (en, ko, lat, lng, extra = "", group = "") =>
+        `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><a class="city-link" href="guide.html#${group}/${slug(en)}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span></a>${extra}${where(lat, lng)}</li>`;
 
       // Dot map: every city plotted by latitude and longitude (no coastline, just positions).
       const X = (lng) => ((lng - 125.9) * 81).toFixed(1);
@@ -98,7 +100,7 @@
         (p) => `
         <section class="city-group prov" id="${p.guide}" data-group style="--accent:${colorOf(p.guide)}">
           <h2 class="section-title">${esc(p.name)} <span class="ko-inline">${esc(p.ko)}</span> <small>${p.cities.length}</small></h2>
-          <ul class="city-grid">${p.cities.map(([en, ko, lat, lng]) => city(en, ko, lat, lng)).join("")}</ul>
+          <ul class="city-grid">${p.cities.map(([en, ko, lat, lng]) => city(en, ko, lat, lng, "", p.guide)).join("")}</ul>
         </section>`
       ).join("");
 
@@ -106,7 +108,7 @@
         <section class="city-group special" id="special-cities" data-group>
           <h2 class="section-title">Special cities <span class="ko-inline">특별시 · 광역시 · 특별자치시</span> <small>${SPECIAL_CITIES.length}</small></h2>
           <p class="prose">These cities are not part of any province. Seoul has special city status, six cities are metropolitan cities, and Sejong is a special self-governing city.</p>
-          <ul class="city-grid">${SPECIAL_CITIES.map((c) => city(c.name, c.ko, c.lat, c.lng, `<em>${esc(c.type)}</em>`)).join("")}</ul>
+          <ul class="city-grid">${SPECIAL_CITIES.map((c) => city(c.name, c.ko, c.lat, c.lng, `<em>${esc(c.type)}</em>`, "special")).join("")}</ul>
         </section>`;
 
       document.getElementById("city-search").addEventListener("input", (e) => {

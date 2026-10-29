@@ -1,8 +1,8 @@
 const TABS = [
   { key: "attractions", label: "Attractions", ko: "관광지" },
-  { key: "hotels", label: "Hotels", ko: "호텔" },
-  { key: "foods", label: "Local Food", ko: "먹거리" },
-  { key: "restaurants", label: "Where to Eat", ko: "식당" },
+  { key: "restaurants", label: "Restaurants", ko: "맛집" },
+  { key: "hotels", label: "Places to stay", ko: "숙소" },
+  { key: "foods", label: "Local food", ko: "먹거리" },
 ];
 
 const grid = document.getElementById("province-grid");

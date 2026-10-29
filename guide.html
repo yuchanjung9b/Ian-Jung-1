@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Korea Travel Guide · 한국 여행 가이드</title>
+    <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
+    <link rel="stylesheet" href="styles.css?v=15" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
+        <span class="nav-links"><a href="index.html">Home</a> <a href="guide.html">Guide</a> <a href="hanbando.html">한반도</a></span>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="wrap">
+        <p class="eyebrow">대한민국 여행 가이드</p>
+        <h1>Travel Korea, one city at a time</h1>
+        <p class="lead">
+          Pick a province, then a city, to see its attractions, 맛집, places to stay and local food, with prices.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section aria-labelledby="pick-title">
+        <h2 id="pick-title" class="section-title">Provinces <span class="ko-inline">도</span></h2>
+        <div id="province-grid" class="province-grid"></div>
+      </section>
+
+      <section aria-labelledby="special-title">
+        <h2 id="special-title" class="section-title">Special cities <span class="ko-inline">특별시 · 광역시</span></h2>
+        <div id="special-grid" class="province-grid"></div>
+      </section>
+
+      <section id="detail" class="detail" aria-live="polite"></section>
+
+      <p class="note">
+        Prices are approximate, in Korean won (₩). The USD amounts use a rough rate of ₩<span id="rate"></span> = $1.
+        Prices and opening times change, so check before you go.
+      </p>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap"><a href="index.html">Home</a> · Korea Travel Guide · 한국 여행 가이드</div>
+    </footer>
+
+    <!-- Bump ?v= after editing so browsers load the new files instead of an old copy -->
+    <script src="data.js?v=6"></script>
+    <script src="cities.js?v=4"></script>
+    <script src="script.js?v=10"></script>
+  </body>
+</html>
