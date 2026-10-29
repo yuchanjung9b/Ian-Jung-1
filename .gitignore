@@ -1,4 +1,3 @@
 # Uploaded source files stay private (not pushed to GitHub)
 uploads/*
 !uploads/README.txt
-diningcode.com/rank/경남
