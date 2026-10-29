@@ -3,17 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ian-Jung-1</title>
+    <title>Korea Travel Guide · 한국 여행 가이드</title>
+    <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="container">
-      <h1>Ian-Jung-1</h1>
-      <p class="subtitle">A simple page with connected HTML, CSS, and JavaScript.</p>
-      <button id="clickMe" type="button">Click me</button>
-      <p id="message" aria-live="polite">The page is ready.</p>
+    <header class="hero">
+      <div class="wrap">
+        <p class="eyebrow">대한민국 여행 가이드</p>
+        <h1>Travel Korea, one province at a time</h1>
+        <p class="lead">
+          Famous sights, where to stay, what to eat and how much it costs, across all 8 provinces of South Korea.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section aria-labelledby="pick-title">
+        <h2 id="pick-title" class="section-title">Choose a province</h2>
+        <div id="province-grid" class="province-grid"></div>
+      </section>
+
+      <section id="detail" class="detail" aria-live="polite"></section>
+
+      <p class="note">
+        Prices are approximate, in Korean won (₩). The USD amounts use a rough rate of ₩<span id="rate"></span> = $1.
+        Prices and opening times change, so check before you go.
+      </p>
     </main>
 
+    <footer class="footer">
+      <div class="wrap">Korea Travel Guide · 한국 여행 가이드</div>
+    </footer>
+
+    <script src="data.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
