@@ -986,7 +986,6 @@ html {
   scroll-margin-top: 70px;
 }
 .city-group.special {
-  margin-top: 56px;
-  padding-top: 8px;
-  border-top: 2px dashed var(--line);
+  padding-bottom: 8px;
+  border-bottom: 2px dashed var(--line);
 }

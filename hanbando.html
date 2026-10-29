@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>한반도 · Provinces and Cities of South Korea</title>
     <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
-    <link rel="stylesheet" href="styles.css?v=12" />
+    <link rel="stylesheet" href="styles.css?v=13" />
   </head>
   <body>
     <nav class="nav">
@@ -30,8 +30,8 @@
       </label>
       <nav class="jump" id="jump" aria-label="Jump to a province"></nav>
 
-      <div id="provinces"></div>
       <div id="special"></div>
+      <div id="provinces"></div>
       <p id="no-match" class="empty" hidden>No city matches that search.</p>
 
       <p class="note">
@@ -57,8 +57,8 @@
         `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span>${extra}</li>`;
 
       document.getElementById("jump").innerHTML =
-        PROVINCE_CITIES.map((p) => `<a href="#${p.guide}" style="--accent:${colorOf(p.guide)}">${esc(p.ko)}</a>`).join("") +
-        `<a href="#special-cities" style="--accent:#c0392b">특별시 · 광역시</a>`;
+        `<a href="#special-cities" style="--accent:#c0392b">특별시 · 광역시</a>` +
+        PROVINCE_CITIES.map((p) => `<a href="#${p.guide}" style="--accent:${colorOf(p.guide)}">${esc(p.ko)}</a>`).join("");
 
       document.getElementById("provinces").innerHTML = PROVINCE_CITIES.map(
         (p) => `
