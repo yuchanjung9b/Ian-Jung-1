@@ -947,14 +947,10 @@ html {
   align-items: flex-start;
 }
 .map svg {
-  flex: 0 1 45px;
+  flex: 0 1 200px;
   width: 100%;
-  max-width: 45px;
+  max-width: 200px;
   height: auto;
-}
-/* At this size the city names would be unreadable, so they show on hover instead (each dot has a tooltip). */
-.map svg text {
-  display: none;
 }
 .legend {
   display: grid;

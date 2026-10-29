@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>한반도 · Provinces and Cities of South Korea</title>
     <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
-    <link rel="stylesheet" href="styles.css?v=24" />
+    <link rel="stylesheet" href="styles.css?v=25" />
     <link rel="stylesheet" href="site.css?v=1" />
   </head>
   <body>
@@ -28,7 +28,7 @@
 
       <section id="map" class="map-block" aria-labelledby="map-title">
         <h2 id="map-title" class="section-title">Where the cities are</h2>
-        <div id="map" class="map"></div>
+        <div id="dot-map" class="map"></div>
       </section>
 
       <div id="special"></div>
@@ -72,12 +72,12 @@
       ).join("");
       const labels = SPECIAL_CITIES.map(
         (c) => c.name === "Incheon"
-          ? `<text x="${Number(X(c.lng)) - 12}" y="${Number(Y(c.lat)) + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#7a1f16">${esc(c.name)}</text>`
-          : `<text x="${Number(X(c.lng)) + 12}" y="${Number(Y(c.lat)) + 4}" font-size="12" font-weight="700" fill="#7a1f16">${esc(c.name)}</text>`
+          ? `<text x="${Number(X(c.lng)) - 12}" y="${Number(Y(c.lat)) + 4}" text-anchor="end" font-size="17" font-weight="700" fill="#7a1f16">${esc(c.name)}</text>`
+          : `<text x="${Number(X(c.lng)) + 12}" y="${Number(Y(c.lat)) + 4}" font-size="17" font-weight="700" fill="#7a1f16">${esc(c.name)}</text>`
       ).join("");
-      document.getElementById("map").innerHTML = `
-        <svg viewBox="0 0 330 550" role="img" aria-label="Map showing the position of every city">
-          <rect width="330" height="550" rx="14" fill="#eaf1f6" />
+      document.getElementById("dot-map").innerHTML = `
+        <svg viewBox="-40 0 370 550" role="img" aria-label="Map showing the position of every city">
+          <rect x="-40" width="370" height="550" rx="14" fill="#eaf1f6" />
           ${dots}${stars}${labels}
         </svg>
         <ul class="legend">
