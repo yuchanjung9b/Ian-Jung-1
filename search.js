@@ -1,9 +1,11 @@
 // Site-wide search over every place in data.js, with category and province filters.
+// "words" are extra search terms for each category, so "맛집", "restaurant" or "hotel" find the right places
+// even though those words are not in the place's own text.
 const CATS = [
-  { key: "attractions", label: "Attractions", ko: "관광지" },
-  { key: "restaurants", label: "Restaurants", ko: "맛집" },
-  { key: "hotels", label: "Places to stay", ko: "숙소" },
-  { key: "foods", label: "Local food", ko: "먹거리" },
+  { key: "attractions", label: "Attractions", ko: "관광지", words: "관광지 명소 볼거리 attraction attractions sight sights sightseeing" },
+  { key: "restaurants", label: "Restaurants", ko: "맛집", words: "맛집 식당 restaurant restaurants eat eating dining" },
+  { key: "hotels", label: "Places to stay", ko: "숙소", words: "숙소 호텔 숙박 hotel hotels stay stays accommodation lodging guesthouse" },
+  { key: "foods", label: "Local food", ko: "먹거리", words: "먹거리 음식 특산물 food foods dish dishes local cuisine" },
 ];
 
 const esc = (t) => { const d = document.createElement("div"); d.textContent = t ?? ""; return d.innerHTML; };
@@ -18,6 +20,11 @@ const usd = (price) => {
 
 // Flatten every place and work out which city page it belongs on.
 const SPECIAL_NAMES = SPECIAL_CITIES.map((c) => c.name);
+// Korean names of cities, so "부산" or "전주" find places there.
+const CITY_KO = new Map([
+  ...SPECIAL_CITIES.map((c) => [c.name, c.ko]),
+  ...PROVINCE_CITIES.flatMap((p) => [...p.cities, ...(p.counties || [])].map(([en, ko]) => [baseName(en), ko])),
+]);
 const ALL = PROVINCES.flatMap((p) =>
   CATS.flatMap((c) =>
     (p[c.key] || []).map((it) => {
@@ -25,7 +32,7 @@ const ALL = PROVINCES.flatMap((p) =>
       const href = !it.city
         ? `province.html?p=${p.id}`
         : `city.html?p=${special ? "special" : p.id}&c=${slug(it.city)}`;
-      const text = [it.name, it.ko, it.desc, it.city, p.name, p.ko].join(" ").toLowerCase();
+      const text = [it.name, it.ko, it.desc, it.city, CITY_KO.get(baseName(it.city)), p.name, p.ko, c.label, c.words].join(" ").toLowerCase();
       return { it, cat: c, prov: p, href, text, name: `${it.name} ${it.ko}`.toLowerCase() };
     })
   )
