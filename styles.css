@@ -947,9 +947,9 @@ html {
   align-items: flex-start;
 }
 .map svg {
-  flex: 0 1 150px;
+  flex: 0 1 80px;
   width: 100%;
-  max-width: 150px;
+  max-width: 80px;
   height: auto;
 }
 /* At this size the city names would be unreadable, so they show on hover instead (each dot has a tooltip). */
