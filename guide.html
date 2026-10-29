@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Korea Travel Guide · 한국 여행 가이드</title>
     <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body>
     <nav class="nav">
@@ -27,8 +27,13 @@
 
     <main class="wrap">
       <section aria-labelledby="pick-title">
-        <h2 id="pick-title" class="section-title">Choose a province</h2>
+        <h2 id="pick-title" class="section-title">Provinces <span class="ko-inline">도</span></h2>
         <div id="province-grid" class="province-grid"></div>
+      </section>
+
+      <section aria-labelledby="special-title">
+        <h2 id="special-title" class="section-title">Special cities <span class="ko-inline">특별시 · 광역시</span></h2>
+        <div id="special-grid" class="province-grid"></div>
       </section>
 
       <section id="detail" class="detail" aria-live="polite"></section>
@@ -46,6 +51,6 @@
     <!-- Bump ?v= after editing so browsers load the new files instead of an old copy -->
     <script src="data.js?v=6"></script>
     <script src="cities.js?v=4"></script>
-    <script src="script.js?v=8"></script>
+    <script src="script.js?v=9"></script>
   </body>
 </html>

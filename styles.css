@@ -932,3 +932,17 @@ html {
   font-size: 1rem;
   color: var(--muted);
 }
+
+/* Special-city cards have no photo, so add top padding and a small label */
+.special-card {
+  padding-top: 16px;
+  border-top: 5px solid var(--accent);
+}
+.special-card.active {
+  border-top-color: #fff;
+}
+.city-card .kind {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}

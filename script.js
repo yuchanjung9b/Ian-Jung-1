@@ -35,6 +35,21 @@ function photo(src, alt = "") {
   return `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()" />`;
 }
 
+function renderSpecialGrid(activeId) {
+  const grid2 = document.getElementById("special-grid");
+  if (!grid2) return;
+  grid2.innerHTML = specialList
+    .map(
+      (c) => `
+      <a class="province-card special-card${activeId === c.slug ? " active" : ""}" href="#special/${c.slug}" style="--accent:${SPECIAL_COLOR}">
+        <span class="ko">${esc(c.ko)}</span>
+        <span class="en">${esc(c.name)}</span>
+        <span class="cities">${esc(c.type)}</span>
+      </a>`
+    )
+    .join("");
+}
+
 function renderGrid(activeId) {
   grid.innerHTML = PROVINCES.map(
     (p) => `
@@ -53,17 +68,34 @@ const slug = (name) => baseName(name).toLowerCase().replace(/\s+/g, "-");
 const inCity = (it, name) => baseName(it.city) === baseName(name);
 const placesIn = (p, name) => TABS.reduce((n, t) => n + (p[t.key] || []).filter((it) => inCity(it, name)).length, 0);
 
-// Cities, counties and nearby special cities that belong to a province, in the order they are shown.
+// Cities and counties that belong to a province, in the order they are shown.
 function placesOf(p) {
   const entry = PROVINCE_CITIES.find((c) => c.guide === p.id);
   if (!entry) return [];
-  const special = (entry.nearby || []).map((n) => SPECIAL_CITIES.find((s) => s.name === n)).filter(Boolean);
   return [
     ...entry.cities.map(([name, ko]) => ({ name, ko, kind: "City" })),
     ...(entry.counties || []).map(([name, ko]) => ({ name, ko, kind: "County" })),
-    ...special.map((s) => ({ name: s.name, ko: s.ko, kind: s.type })),
   ].map((c) => ({ ...c, slug: slug(c.name) }));
 }
+
+// Special cities (Seoul, Busan...) are their own section. Their places are stored under a nearby province in
+// data.js, tagged with the special city's name, so gather them into one pseudo-province with the id "special".
+// A tag with brackets, like "Gwangju (Gyeonggi)", is an ordinary city that shares the name, so it is skipped.
+const SPECIAL_COLOR = "#c0392b";
+const specialList = SPECIAL_CITIES.map((c) => ({ ...c, kind: c.type, slug: slug(c.name) }));
+const specialProvince = {
+  id: "special",
+  name: "Special cities",
+  color: SPECIAL_COLOR,
+  ...Object.fromEntries(
+    TABS.map((t) => [
+      t.key,
+      PROVINCES.flatMap((p) =>
+        (p[t.key] || []).filter((it) => it.city === baseName(it.city) && SPECIAL_CITIES.some((c) => c.name === it.city))
+      ),
+    ])
+  ),
+};
 
 function renderItems(p, city, key) {
   const items = (p[key] || []).filter((it) => inCity(it, city.name));
@@ -125,7 +157,31 @@ function renderProvince(p) {
       <h3 class="pick-title">Choose a city in ${esc(p.name)}</h3>
       ${group("Cities", all.filter((c) => c.kind === "City"))}
       ${group("Counties with listings", all.filter((c) => c.kind === "County"))}
-      ${group("Special cities nearby", all.filter((c) => c.kind !== "City" && c.kind !== "County"))}
+    </div>`;
+}
+
+function renderSpecialList() {
+  const cards = specialList
+    .map((c) => {
+      const n = placesIn(specialProvince, c.name);
+      return `<a class="city-card${n ? "" : " empty-city"}" href="#special/${c.slug}">
+        <span class="name">${esc(c.name)}</span>
+        <span class="ko">${esc(c.ko)}</span>
+        <span class="count">${n ? `${n} place${n === 1 ? "" : "s"}` : "Coming soon"}</span>
+        <span class="kind">${esc(c.type)}</span>
+      </a>`;
+    })
+    .join("");
+  detail.innerHTML = `
+    <div class="detail-head" style="--accent:${SPECIAL_COLOR}">
+      <div class="detail-text">
+        <h3>Special cities <span>특별시 · 광역시 · 특별자치시</span></h3>
+        <p>Seoul, the six metropolitan cities and Sejong are governed on their own, apart from the provinces.</p>
+      </div>
+    </div>
+    <div class="city-panel" style="--accent:${SPECIAL_COLOR}">
+      <h3 class="pick-title">Choose a special city</h3>
+      <div class="city-cards">${cards}</div>
     </div>`;
 }
 
@@ -170,6 +226,14 @@ function route() {
   const [provId, citySlug] = location.hash.slice(1).split("/");
   const province = PROVINCES.find((p) => p.id === provId);
   renderGrid(province?.id);
+  renderSpecialGrid(provId === "special" ? citySlug : null);
+  if (provId === "special") {
+    const special = citySlug && specialList.find((c) => c.slug === citySlug);
+    if (special) renderCity(specialProvince, special);
+    else renderSpecialList();
+    detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
   if (!province) {
     detail.innerHTML = `<p class="hint">👆 Pick a province above, then a city, to see where to go, stay and eat.</p>`;
     return;

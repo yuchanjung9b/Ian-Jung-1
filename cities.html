@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cities of Korea · Korea Travel Guide · 한국 여행 가이드</title>
     <meta name="description" content="Every city in South Korea, listed by province, with the special cities shown separately." />
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body>
     <nav class="nav">
@@ -51,7 +51,7 @@
         const inner = province ? `<a href="guide.html#${province}/${slug(en)}">${label}</a>` : label;
         return `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}">${inner}</li>`;
       };
-      const provinceOfSpecial = (name) => PROVINCE_CITIES.find((p) => (p.nearby || []).includes(name))?.guide;
+      const provinceOfSpecial = () => "special"; // special cities have their own section in the guide
 
       function render() {
         list.innerHTML =
