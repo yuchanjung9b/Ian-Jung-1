@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in · Korea Travel Guide</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="styles.css?v=25" />
+    <link rel="stylesheet" href="site.css?v=5" />
+    <script src="firebase-config.js?v=1"></script>
+    <script src="auth.js?v=1"></script>
+  </head>
+  <body class="login-page">
+    <main class="login-box">
+      <p class="eyebrow">대한민국 여행 가이드</p>
+      <h1>Welcome to Korea Travel Guide</h1>
+      <p class="muted">Sign in or create an account to continue.</p>
+
+      <button id="google" type="button" class="button google-btn">Continue with Google</button>
+      <p class="or"><span>or</span></p>
+
+      <form id="login-form">
+        <label>Email <input type="email" name="email" autocomplete="email" required /></label>
+        <label>Password <input type="password" name="password" autocomplete="current-password" minlength="6" required /></label>
+        <p id="msg" class="login-msg" role="alert"></p>
+        <button type="submit" id="submit" class="button button-dark">Sign in</button>
+      </form>
+      <p class="login-links">
+        <a href="#" id="toggle">New here? Create an account</a> ·
+        <a href="#" id="forgot">Forgot password?</a>
+      </p>
+    </main>
+
+    <script>
+      (function () {
+        const $ = (id) => document.getElementById(id);
+        const msg = $("msg");
+        let signup = false;
+        const say = (t) => (msg.textContent = t);
+        const nice = (e) =>
+          ({
+            "auth/invalid-credential": "Wrong email or password.",
+            "auth/email-already-in-use": "That email already has an account. Try signing in.",
+            "auth/weak-password": "Use a password with at least 6 characters.",
+            "auth/popup-closed-by-user": "The Google window was closed before finishing.",
+            "auth/unauthorized-domain": "This website's address is not allowed yet in Firebase (Authentication → Settings → Authorized domains).",
+            "auth/operation-not-allowed": "This sign-in method is not turned on in Firebase yet.",
+          })[e.code] || "Something went wrong. Please try again.";
+
+        if (!window.Auth) {
+          say("Login is not set up yet. The site owner needs to add the Firebase settings (see README-login.txt).");
+          document.querySelectorAll("button, input").forEach((el) => (el.disabled = true));
+          return;
+        }
+        const run = async (fn) => { say(""); try { await fn(); } catch (e) { say(nice(e)); } };
+
+        $("google").addEventListener("click", () => run(() => Auth.google()));
+        $("login-form").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const f = ev.target;
+          run(() => (signup ? Auth.signUp(f.email.value, f.password.value) : Auth.signIn(f.email.value, f.password.value)));
+        });
+        $("toggle").addEventListener("click", (ev) => {
+          ev.preventDefault();
+          signup = !signup;
+          $("submit").textContent = signup ? "Create account" : "Sign in";
+          $("toggle").textContent = signup ? "Have an account? Sign in" : "New here? Create an account";
+          document.querySelector("[name=password]").autocomplete = signup ? "new-password" : "current-password";
+          say("");
+        });
+        $("forgot").addEventListener("click", (ev) => {
+          ev.preventDefault();
+          const email = document.querySelector("[name=email]").value;
+          if (!email) return say("Type your email above first.");
+          run(async () => { await Auth.reset(email); say("Password reset email sent."); });
+        });
+      })();
+    </script>
+  </body>
+</html>
