@@ -55,6 +55,8 @@ function renderItems(p, key) {
             ${it.type ? `<span class="badge badge-${esc(it.type.toLowerCase())}">${esc(it.type)}</span>` : ""}
           </div>
           <p>${esc(it.desc)}</p>
+          ${it.address ? `<p class="address">📍 ${esc(it.address)}
+            <a href="https://map.naver.com/p/search/${encodeURIComponent(it.ko + " " + it.address)}" target="_blank" rel="noopener">Map</a></p>` : ""}
           <p class="price">${withUsd(it.price)}</p>
           ${it.source ? `<p class="source">Source: ${esc(it.source)}</p>` : ""}
         </li>`
