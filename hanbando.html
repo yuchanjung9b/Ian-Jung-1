@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>한반도 · Provinces and Cities of South Korea</title>
+    <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
+    <link rel="stylesheet" href="styles.css?v=12" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
+        <span class="nav-links"><a href="index.html">Home</a> <a href="hanbando.html">한반도</a></span>
+      </div>
+    </nav>
+
+    <header class="hero hero-small">
+      <div class="wrap hero-inner">
+        <p class="eyebrow">대한민국</p>
+        <h1>한반도 <span class="h1-sub">Provinces and cities</span></h1>
+        <p class="lead">Every province of South Korea and the cities that belong to it. Special cities are governed on their own, so they are listed separately.</p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <p class="count-line" id="count-line"></p>
+      <label class="city-search">Find a city
+        <input type="search" id="city-search" placeholder="Type a name in English or Korean" autocomplete="off" />
+      </label>
+      <nav class="jump" id="jump" aria-label="Jump to a province"></nav>
+
+      <div id="provinces"></div>
+      <div id="special"></div>
+      <p id="no-match" class="empty" hidden>No city matches that search.</p>
+
+      <p class="note">
+        Cities (시) only; counties (군) are not listed. Counts follow the official lists as of 2024 and can change
+        when a town is upgraded to a city.
+      </p>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap"><a href="index.html">Home</a> · Korea Travel Guide · 한국 여행 가이드</div>
+    </footer>
+
+    <script src="data.js?v=6"></script>
+    <script src="cities.js?v=4"></script>
+    <script>
+      const esc = (t) => { const d = document.createElement("div"); d.textContent = t ?? ""; return d.innerHTML; };
+      const colorOf = (id) => PROVINCES.find((p) => p.id === id)?.color || "#555";
+      const total = PROVINCE_CITIES.reduce((n, p) => n + p.cities.length, 0);
+      document.getElementById("count-line").innerHTML =
+        `<strong>${PROVINCE_CITIES.length}</strong> provinces with <strong>${total}</strong> cities, plus <strong>${SPECIAL_CITIES.length}</strong> special cities.`;
+
+      const city = (en, ko, extra = "") =>
+        `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span>${extra}</li>`;
+
+      document.getElementById("jump").innerHTML =
+        PROVINCE_CITIES.map((p) => `<a href="#${p.guide}" style="--accent:${colorOf(p.guide)}">${esc(p.ko)}</a>`).join("") +
+        `<a href="#special-cities" style="--accent:#c0392b">특별시 · 광역시</a>`;
+
+      document.getElementById("provinces").innerHTML = PROVINCE_CITIES.map(
+        (p) => `
+        <section class="city-group prov" id="${p.guide}" data-group style="--accent:${colorOf(p.guide)}">
+          <h2 class="section-title">${esc(p.name)} <span class="ko-inline">${esc(p.ko)}</span> <small>${p.cities.length}</small></h2>
+          <ul class="city-grid">${p.cities.map(([en, ko]) => city(en, ko)).join("")}</ul>
+        </section>`
+      ).join("");
+
+      document.getElementById("special").innerHTML = `
+        <section class="city-group special" id="special-cities" data-group>
+          <h2 class="section-title">Special cities <span class="ko-inline">특별시 · 광역시 · 특별자치시</span> <small>${SPECIAL_CITIES.length}</small></h2>
+          <p class="prose">These cities are not part of any province. Seoul has special city status, six cities are metropolitan cities, and Sejong is a special self-governing city.</p>
+          <ul class="city-grid">${SPECIAL_CITIES.map((c) => city(c.name, c.ko, `<em>${esc(c.type)}</em>`)).join("")}</ul>
+        </section>`;
+
+      document.getElementById("city-search").addEventListener("input", (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        let shown = 0;
+        document.querySelectorAll("[data-group]").forEach((g) => {
+          let any = false;
+          g.querySelectorAll(".city").forEach((li) => {
+            const match = !q || li.dataset.q.includes(q);
+            li.hidden = !match;
+            any = any || match;
+            if (match) shown++;
+          });
+          g.hidden = !any;
+        });
+        document.getElementById("no-match").hidden = shown > 0;
+      });
+    </script>
+  </body>
+</html>
