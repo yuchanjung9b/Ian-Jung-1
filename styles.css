@@ -989,3 +989,52 @@ html {
   padding-bottom: 8px;
   border-bottom: 2px dashed var(--line);
 }
+
+/* Location: dot map and per-city coordinates (v14) */
+.map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+.map svg {
+  flex: 0 1 330px;
+  width: 100%;
+  max-width: 330px;
+  height: auto;
+}
+.legend {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+}
+.legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  vertical-align: -1px;
+  border-radius: 50%;
+}
+.legend small {
+  color: var(--muted);
+}
+.loc {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.city .loc a {
+  display: inline;
+  color: var(--blue);
+  font-weight: 700;
+}
+.map a circle {
+  cursor: pointer;
+}
+.map a:hover circle {
+  stroke: var(--ink);
+}
