@@ -44,6 +44,13 @@
     tools.appendChild(b);
   }
 
+  // If Firebase is slow or blocked, never leave a blank page: show the login page (or send people to it).
+  setTimeout(() => {
+    if (!document.documentElement.classList.contains("auth-wait")) return;
+    if (onLogin) document.documentElement.classList.remove("auth-wait");
+    else location.replace("login.html");
+  }, 8000);
+
   ready.then(({ a, auth }) => {
     a.onAuthStateChanged(auth, (user) => {
       if (onLogin) {
