@@ -255,13 +255,17 @@
   border-top: 1px solid #3a4048;
 }
 
-/* ---- Home: hero carousel ---- */
+/* ---- Home: hero carousel ----
+   The slide, the search box and the arrows each get their own space (slides on top, a control bar below),
+   so nothing is stacked over anything else at any screen width. */
 .carousel {
-  position: relative;
-  height: clamp(380px, 56vw, 560px);
-  overflow: hidden;
   color: #fff;
   background: #1f2328;
+}
+.slides {
+  position: relative;
+  height: clamp(360px, 44vw, 500px);
+  overflow: hidden;
 }
 .slide {
   position: absolute;
@@ -289,11 +293,14 @@
 }
 .slide .copy {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
+  inset: 0;
   z-index: 1;
-  transform: translateY(-62%);
+  display: flex;
+  align-items: center;
+  padding-block: 20px;
+}
+.slide .copy .wrap {
+  width: 100%;
 }
 .slide .kicker {
   margin: 0 0 8px;
@@ -305,80 +312,46 @@
 .slide h2 {
   max-width: 14ch;
   margin: 0;
-  font-size: clamp(2rem, 6vw, 3.6rem);
+  font-size: clamp(1.8rem, 5.5vw, 3.4rem);
   line-height: 1.08;
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
 }
 .slide p.sub {
   max-width: 46ch;
-  margin: 14px 0 0;
-  font-size: 1.1rem;
+  margin: 12px 0 0;
+  font-size: clamp(0.95rem, 2.4vw, 1.1rem);
 }
 .slide .button {
-  margin-top: 20px;
+  margin-top: 16px;
 }
-.car-ctrl {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 22px;
-  z-index: 2;
-}
-.car-ctrl .wrap {
+.car-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 14px 24px;
+  padding-block: 16px 52px; /* room for the tiles that overlap the bottom edge */
 }
-.car-ctrl button {
-  width: 36px;
-  height: 36px;
-  font: inherit;
-  font-size: 1.1rem;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  cursor: pointer;
-}
-.car-ctrl .dots {
+.car-search {
   display: flex;
-  gap: 8px;
-  margin-left: 6px;
-}
-.car-ctrl .dots button {
-  width: 12px;
-  height: 12px;
-  padding: 0;
-  background: transparent;
-}
-.car-ctrl .dots button[aria-current="true"] {
-  background: #fff;
-}
-.hero-search {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 72px;
-  z-index: 2;
-}
-.hero-search form {
-  display: flex;
+  flex: 1 1 240px;
+  min-width: 0;
   max-width: 560px;
   background: #fff;
   border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-.hero-search input {
-  flex: 1;
+.car-search input {
+  flex: 1 1 0;
+  width: 0;
   min-width: 0;
-  padding: 14px 20px;
+  padding: 13px 20px;
   font: inherit;
   color: var(--ink);
   border: 0;
   background: none;
   border-radius: 999px;
 }
-.hero-search button {
+.car-search button {
   padding: 0 22px;
   font: inherit;
   font-weight: 700;
@@ -387,6 +360,36 @@
   border: 0;
   border-radius: 999px;
   cursor: pointer;
+}
+.car-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.car-ctrl button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  font: inherit;
+  font-size: 1.2rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.car-ctrl .dots {
+  display: flex;
+  gap: 10px;
+  margin-left: 6px;
+}
+.car-ctrl .dots button {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+.car-ctrl .dots button[aria-current="true"] {
+  background: #fff;
 }
 
 /* ---- Home: tiles, cards, call to action ---- */
