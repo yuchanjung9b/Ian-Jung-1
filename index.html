@@ -4,40 +4,97 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Korea Travel Guide · 한국 여행 가이드</title>
-    <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
-    <link rel="stylesheet" href="styles.css?v=3" />
+    <meta name="description" content="Plan your trip to South Korea: what to see, where to stay, what to eat and what it costs, province by province." />
+    <link rel="stylesheet" href="styles.css?v=4" />
   </head>
   <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
+        <a href="guide.html">Explore provinces</a>
+      </div>
+    </nav>
+
     <header class="hero">
       <div class="wrap">
         <p class="eyebrow">대한민국 여행 가이드</p>
-        <h1>Travel Korea, one province at a time</h1>
+        <h1>Plan your trip to South Korea</h1>
         <p class="lead">
-          Famous sights, where to stay, what to eat and how much it costs, across all 8 provinces of South Korea.
+          A simple guide to what to see, where to stay, what to eat and how much it costs, so you can plan
+          with confidence even if it is your first visit.
         </p>
+        <a class="button" href="guide.html">Start exploring →</a>
       </div>
     </header>
 
     <main class="wrap">
-      <section aria-labelledby="pick-title">
-        <h2 id="pick-title" class="section-title">Choose a province</h2>
-        <div id="province-grid" class="province-grid"></div>
+      <section aria-labelledby="about-title">
+        <h2 id="about-title" class="section-title">What is this website?</h2>
+        <p class="prose">
+          Korea Travel Guide collects the useful basics for a trip to South Korea in one place. Pick a province
+          and you will find famous sights, hotels for every budget, local dishes to try and good restaurants,
+          each with an approximate price in Korean won and US dollars. There is no sign-up and nothing to book here.
+          It is a starting point for your own plan.
+        </p>
       </section>
 
-      <section id="detail" class="detail" aria-live="polite"></section>
+      <section aria-labelledby="korea-title">
+        <h2 id="korea-title" class="section-title">About Korea <span class="ko-inline">대한민국</span></h2>
+        <p class="prose">
+          South Korea sits on the Korean Peninsula in East Asia. Its capital, Seoul, is one of the world's
+          great cities, and the country packs a lot into a small area: royal palaces and mountain temples,
+          hiking trails and beaches, volcanic Jeju Island, and modern cities full of neon, cafés and K-pop.
+          Korean food, from barbecue to street snacks, is a reason to visit all by itself.
+        </p>
+        <ul class="facts">
+          <li><strong>Capital</strong>Seoul (서울)</li>
+          <li><strong>Language</strong>Korean, written in Hangul (한글)</li>
+          <li><strong>Currency</strong>Korean won (₩)</li>
+          <li><strong>Seasons</strong>Four distinct seasons. Spring blossoms and autumn leaves are the favorites.</li>
+          <li><strong>Getting around</strong>Fast trains (KTX), subways and buses connect nearly every city.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="help-title">
+        <h2 id="help-title" class="section-title">How this site helps you plan</h2>
+        <div class="feature-grid">
+          <article class="feature">
+            <h3>🏯 Attractions <small>관광지</small></h3>
+            <p>Palaces, temples, markets, islands and viewpoints worth your time, with entry prices.</p>
+          </article>
+          <article class="feature">
+            <h3>🛏️ Hotels <small>호텔</small></h3>
+            <p>Luxury, mid-range and budget places to stay, with a typical price per night.</p>
+          </article>
+          <article class="feature">
+            <h3>🍲 Local food <small>먹거리</small></h3>
+            <p>Regional dishes to look for, and what each one usually costs.</p>
+          </article>
+          <article class="feature">
+            <h3>🍽️ Where to eat <small>식당</small></h3>
+            <p>Restaurants to try, with map links so you can find them on Naver Map.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="how-title">
+        <h2 id="how-title" class="section-title">How to use it</h2>
+        <ol class="steps">
+          <li>Open the <a href="guide.html">province guide</a> and choose where you are headed.</li>
+          <li>Browse attractions, hotels, food and restaurants using the tabs.</li>
+          <li>Use the prices to build a rough budget, then check current details before you go.</li>
+        </ol>
+        <p><a class="button button-dark" href="guide.html">Choose a province →</a></p>
+      </section>
 
       <p class="note">
-        Prices are approximate, in Korean won (₩). The USD amounts use a rough rate of ₩<span id="rate"></span> = $1.
-        Prices and opening times change, so check before you go.
+        Prices are approximate and change over time. Always confirm opening times, prices and entry
+        requirements before you travel.
       </p>
     </main>
 
     <footer class="footer">
       <div class="wrap">Korea Travel Guide · 한국 여행 가이드</div>
     </footer>
-
-    <!-- Bump ?v= after editing so browsers load the new files instead of an old copy -->
-    <script src="data.js?v=3"></script>
-    <script src="script.js?v=3"></script>
   </body>
 </html>
