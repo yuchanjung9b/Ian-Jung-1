@@ -1,4 +1,4 @@
-// Travel data for each of Korea's 8 provinces (도).
+// Travel data for each of Korea's 9 provinces (도).
 // Big cities are listed under the province around them (e.g. Seoul → Gyeonggi, Busan → Gyeongnam).
 // Prices are rough estimates in Korean won (KRW). Update them as you learn more.
 //
@@ -278,6 +278,44 @@ const PROVINCES = [
       { name: "Daepunggwan", ko: "대풍관", address: "경남 통영시 해송정2길 29", city: "Tongyeong", desc: "Abalone pot rice and oyster dishes, neatly served. Featured on 2 Days & 1 Night.", price: "~₩20,000–35,000", source: "DiningCode" },
       { name: "Jangsabu", ko: "장사부", address: "경남 밀양시 남천강변로3길 9-1", city: "Miryang", desc: "Popular Korean-Chinese restaurant for jjajangmyeon and spicy Chinese-style bibimbap.", price: "~₩8,000–13,000", source: "DiningCode" },
       { name: "Basak Kkwabaegi", ko: "바삭꽈배기", address: "경남 거제시 일운면 지세포4길 8", city: "Geoje", desc: "Chewy rice-flour twisted doughnuts, including a green-onion version. Sells out in the afternoon.", price: "~₩1,000–3,000 each", source: "DiningCode" },
+    ],
+  },
+  {
+    id: "jeju",
+    name: "Jeju-do",
+    ko: "제주도",
+    cities: "Jeju City · Seogwipo",
+    color: "#c2477c",
+    intro:
+      "Korea's volcanic island. Hallasan mountain, lava tubes, a sunrise crater, black pork and tangerines, about an hour's flight from Seoul.",
+    attractions: [
+      { name: "Hallasan National Park", ko: "한라산", city: "Jeju City", desc: "Korea's highest mountain (1,947 m). Summit trails need a reservation and a full day, shorter trails are easier.", price: "Free" },
+      { name: "Seongsan Ilchulbong", ko: "성산일출봉", city: "Seogwipo", desc: "UNESCO volcanic crater on the coast. A short steep climb gives a famous sunrise view.", price: "₩5,000" },
+      { name: "Manjanggul Cave", ko: "만장굴", city: "Jeju City", desc: "One of the world's longest lava tubes. It stays cool inside all year, so bring a jacket.", price: "₩4,000" },
+      { name: "Jusangjeolli Cliff", ko: "주상절리대", city: "Seogwipo", desc: "Tall hexagonal basalt columns beside the sea, a short walk from the path.", price: "₩2,000" },
+      { name: "Cheonjeyeon Waterfalls", ko: "천제연폭포", city: "Seogwipo", desc: "Three waterfalls in a green gorge, reached by a bridge and a short walk.", price: "₩2,500" },
+      { name: "Jeongbang Waterfall", ko: "정방폭포", city: "Seogwipo", desc: "A waterfall that drops straight into the sea.", price: "₩2,000" },
+      { name: "Udo Island", ko: "우도", city: "Jeju City", desc: "Small island by ferry from Seongsan Port. Rent an e-bike and ride the coast.", price: "~₩11,000 (ferry)" },
+      { name: "Hyeopjae Beach", ko: "협재해수욕장", city: "Jeju City", desc: "White sand and pale blue water, with a view of Biyangdo island.", price: "Free" },
+    ],
+    hotels: [
+      { name: "The Shilla Jeju", ko: "제주신라호텔", city: "Seogwipo", type: "Luxury", desc: "Resort hotel with sea views near Jungmun beach.", price: "₩350,000–600,000" },
+      { name: "Grand Hyatt Jeju", ko: "그랜드 하얏트 제주", city: "Jeju City", type: "Luxury", desc: "Large tower hotel with a casino and shops in central Jeju City.", price: "₩250,000–400,000" },
+      { name: "Lotte City Hotel Jeju", ko: "롯데시티호텔 제주", city: "Jeju City", type: "Mid-range", desc: "Comfortable city hotel, handy for the airport and Dongmun Market.", price: "₩120,000–200,000" },
+      { name: "Seogwipo KAL Hotel", ko: "서귀포 KAL호텔", city: "Seogwipo", type: "Mid-range", desc: "Hillside hotel with views of the southern coast.", price: "₩130,000–220,000" },
+      { name: "Jeju guesthouses", ko: "제주 게스트하우스", city: "Jeju City", type: "Budget", desc: "Friendly small guesthouses around Jeju City and the east coast.", price: "₩30,000–70,000" },
+    ],
+    foods: [
+      { name: "Black pork BBQ", ko: "흑돼지", desc: "Jeju's famous black pigs, grilled at your table.", price: "₩18,000–25,000 / serving" },
+      { name: "Gogi-guksu", ko: "고기국수", desc: "Noodles in a rich pork broth topped with thick slices of pork.", price: "₩9,000–11,000" },
+      { name: "Hallabong tangerines", ko: "한라봉", desc: "Large sweet citrus with a bump on top. Great as a gift.", price: "₩10,000–20,000 / box" },
+      { name: "Galchi-jorim", ko: "갈치조림", desc: "Cutlassfish braised with radish in a spicy sauce.", price: "₩30,000–50,000 / table" },
+      { name: "Jeonbok-juk", ko: "전복죽", desc: "Creamy rice porridge with abalone, a comfort food on cool days.", price: "₩15,000–20,000" },
+    ],
+    restaurants: [
+      { name: "Dongmun Market", ko: "동문시장", city: "Jeju City", desc: "Big traditional market for seafood, tangerines and street snacks.", price: "₩5,000–15,000" },
+      { name: "Seogwipo Maeil Olle Market", ko: "서귀포매일올레시장", city: "Seogwipo", desc: "Covered market with tangerine treats, fried chicken and fresh fish.", price: "₩5,000–15,000" },
+      { name: "Black Pork Street", ko: "흑돼지거리", city: "Jeju City", desc: "A street of grill restaurants serving Jeju black pork.", price: "₩20,000–30,000" },
     ],
   },
 ];

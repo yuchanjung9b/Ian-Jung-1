@@ -11,6 +11,7 @@ const AGES = {
 // Per-person assumptions in KRW. "car" figures are per vehicle (up to 4 people) and are split.
 const ASSUMPTIONS = {
   breakfast: 8000,
+  flight: 80000, // per person, one way, between Jeju and the mainland
   transport: {
     ktx: { label: "KTX train + subway", local: 10000, leg: 45000, extraStops: 0 },
     bus: { label: "Intercity bus + local bus", local: 8000, leg: 28000, extraStops: 0 },
@@ -172,8 +173,13 @@ function build(theme, opts, tier, freeBias, rand) {
   // Travel between regions, starting and ending in Seoul (Gyeonggi).
   const route = ["gyeonggi", ...regions.map((r) => r.id), "gyeonggi"];
   let legs = 0;
-  for (let i = 1; i < route.length; i++) if (route[i] !== route[i - 1]) legs++;
-  totals.transport += legs * (tr.leg ?? (tr.legCar * cars) / people);
+  for (let i = 1; i < route.length; i++) {
+    if (route[i] === route[i - 1]) continue;
+    legs++;
+    // Jeju is an island, so any leg to or from it is a flight whatever the transport choice.
+    const flight = route[i] === "jeju" || route[i - 1] === "jeju";
+    totals.transport += flight ? ASSUMPTIONS.flight : tr.leg ?? (tr.legCar * cars) / people;
+  }
 
   const total = totals.lodging + totals.food + totals.sights + totals.transport;
   return { theme, tier, freeBias, segments, totals, total, legs };
@@ -296,7 +302,7 @@ function generate() {
   const plans = THEMES.map((theme, i) => makePlan(theme, opts, seed * 100 + i + 1));
   results.innerHTML = `
     ${notice}
-    <p class="tips">🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.age))}</p>
+    <p class="tips">${regions.some((r) => r.id === "jeju") ? "✈️ Jeju is reached by plane. Flights are counted in transport here. " : ""}🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.age))}</p>
     <div class="plan-grid">${plans.map((p, i) => renderPlan(p, opts, i)).join("")}</div>
     <p class="actions">
       <button type="button" id="again" class="button button-dark">Show me different plans</button>

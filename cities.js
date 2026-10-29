@@ -57,7 +57,7 @@ const PROVINCE_CITIES = [
     cities: [["Changwon", "창원"], ["Jinju", "진주"], ["Tongyeong", "통영"], ["Sacheon", "사천"], ["Gimhae", "김해"], ["Miryang", "밀양"], ["Geoje", "거제"], ["Yangsan", "양산"]],
   },
   {
-    name: "Jeju-do", ko: "제주특별자치도", guide: null,
+    name: "Jeju-do", ko: "제주특별자치도", guide: "jeju",
     cities: [["Jeju City", "제주시"], ["Seogwipo", "서귀포시"]],
   },
 ];
