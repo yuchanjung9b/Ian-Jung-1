@@ -1,12 +1,46 @@
-// Trip planner: builds three itineraries from PROVINCES (data.js) using age, budget, regions and transport.
+// Trip planner: builds three itineraries from PROVINCES (data.js) using each traveler's age, budget, places and transport.
 // All costs are rough estimates. The assumptions are in the ASSUMPTIONS table below and shown on the page.
 
-const AGES = {
-  young: { label: "18–29", stops: 3 },
-  adult: { label: "30–49", stops: 3 },
-  mature: { label: "50–64", stops: 2 },
-  senior: { label: "65+", stops: 2 },
+// Special cities have their places stored under a nearby province in data.js.
+const SPECIAL_HOST = {
+  Seoul: "gyeonggi", Incheon: "gyeonggi", Busan: "gyeongnam", Ulsan: "gyeongnam",
+  Daegu: "gyeongbuk", Gwangju: "jeonnam", Daejeon: "chungnam", Sejong: "chungnam",
 };
+
+// Each traveler's age changes the pace, the picks and some prices. Rough rules of thumb:
+//   food:    under 4 ×0.2, under 7 ×0.4, under 13 ×0.7
+//   sights:  under 7 free, under 19 half price
+//   transit: under 4 free, under 13 half price (trains and buses)
+//   flights: under 2 ×0.1, under 12 ×0.75
+//   beds:    children under 7 share a bed, so they do not add a room
+const mean = (list) => list.reduce((a, b) => a + b, 0) / list.length;
+const foodFactor = (a) => (a < 4 ? 0.2 : a < 7 ? 0.4 : a < 13 ? 0.7 : 1);
+const sightFactor = (a) => (a < 7 ? 0 : a < 19 ? 0.5 : 1);
+const transitFactor = (a) => (a < 4 ? 0 : a < 13 ? 0.5 : 1);
+const flightFactor = (a) => (a < 2 ? 0.1 : a < 12 ? 0.75 : 1);
+const bandOf = (a) => (a < 13 ? "child" : a < 30 ? "young" : a < 50 ? "adult" : a < 65 ? "mature" : "senior");
+
+function profile(ages) {
+  const share = { child: 0, young: 0, adult: 0, mature: 0, senior: 0 };
+  ages.forEach((a) => (share[bandOf(a)] += 1 / ages.length));
+  const youngest = Math.min(...ages);
+  const oldest = Math.max(...ages);
+  return {
+    ages,
+    share,
+    youngest,
+    oldest,
+    hasSenior: oldest >= 65,
+    hasYoungChild: youngest < 8,
+    beds: Math.max(1, ages.filter((a) => a >= 7).length),
+    food: mean(ages.map(foodFactor)),
+    sights: mean(ages.map(sightFactor)),
+    transit: mean(ages.map(transitFactor)),
+    flight: mean(ages.map(flightFactor)),
+    // Two stops a day when someone is 50+ or a young child is along, otherwise three.
+    stops: oldest >= 50 || youngest < 8 ? 2 : 3,
+  };
+}
 
 // Per-person assumptions in KRW. "car" figures are per vehicle (up to 4 people) and are split.
 const ASSUMPTIONS = {
@@ -32,22 +66,58 @@ const ORIGINS = {
 
 const TIERS = ["Budget", "Mid-range", "Luxury"];
 const ACTIVE = /hik|trail|mountain|beach|surf|cable|climb|island|cycl|night|K-pop|festival|mud|zip|neon|rail bike/i;
-const HARD = /hik|trail|climb|mud|zip|steep|summit/i;
+const HARD = /hik|trail|climb|mud|zip|steep|summit|paraglid|bungee/i;
 const RELAX = /temple|palace|garden|tea|hanok|spa|museum|village|lake|forest|walk|scenic|heritage|UNESCO|fortress|tomb/i;
 const NIGHT = /night|K-pop|neon|club|nightlife/i;
+const FAMILY = /beach|island|cable|cave|park|village|festival|mud|waterfall|garden|market/i;
 
 const form = document.getElementById("plan-form");
 const results = document.getElementById("results");
 const regionBox = document.getElementById("regions");
+const specialBox = document.getElementById("special-places");
+const subBox = document.getElementById("subcities");
+const agesBox = document.getElementById("ages");
 let seed = 1;
 
-regionBox.innerHTML = PROVINCES.map(
-  (p, i) => `
+const baseName = (name) => (name ?? "").replace(/ \(.*\)/, "");
+const chip = (type, name, value, label, checked = false) => `
     <label class="chip">
-      <input type="checkbox" name="region" value="${p.id}"${i === 0 ? " checked" : ""} />
-      <span>${esc(p.name)} <small>${esc(p.ko)}</small></span>
-    </label>`
+      <input type="${type}" name="${name}" value="${esc(value)}"${checked ? " checked" : ""} />
+      <span>${label}</span>
+    </label>`;
+
+// Special cities first, then provinces. Ticking a province opens its list of cities to narrow the trip down.
+specialBox.innerHTML = SPECIAL_CITIES.map((c) => chip("checkbox", "special", c.name, `${esc(c.name)} <small>${esc(c.ko)}</small>`)).join("");
+regionBox.innerHTML = PROVINCES.map(
+  (p, i) => chip("checkbox", "region", p.id, `${esc(p.name)} <small>${esc(p.ko)}</small>`, i === 0)
 ).join("");
+subBox.innerHTML = PROVINCES.map((p) => {
+  const entry = PROVINCE_CITIES.find((c) => c.guide === p.id);
+  const list = entry ? [...entry.cities, ...(entry.counties || [])] : [];
+  return `<div class="subcities" data-for="${p.id}" hidden style="--accent:${p.color}">
+    <h4>Cities in ${esc(p.name)} <small>Optional. Leave all unticked to include the whole province.</small></h4>
+    <div class="chips">${list.map(([en, ko]) => chip("checkbox", "city", `${p.id}|${baseName(en)}`, `${esc(baseName(en))} <small>${esc(ko)}</small>`)).join("")}</div>
+  </div>`;
+}).join("");
+
+function syncSubcities() {
+  const on = new Set([...regionBox.querySelectorAll("input:checked")].map((i) => i.value));
+  subBox.querySelectorAll(".subcities").forEach((d) => (d.hidden = !on.has(d.dataset.for)));
+}
+regionBox.addEventListener("change", syncSubcities);
+syncSubcities();
+
+// One age box per traveler. Changing the number of travelers adds or removes boxes and keeps the ages already typed.
+function syncAges() {
+  const n = Math.min(10, Math.max(1, Number(form.elements.people.value) || 1));
+  const old = [...agesBox.querySelectorAll("input")].map((i) => i.value);
+  agesBox.innerHTML = Array.from({ length: n }, (_, i) => `
+    <label>Traveler ${i + 1}
+      <input type="number" name="age" min="0" max="110" value="${old[i] ?? (i === 0 ? 35 : 33)}" />
+    </label>`).join("");
+}
+form.elements.people.addEventListener("input", syncAges);
+syncAges();
 
 function esc(text) {
   const div = document.createElement("div");
@@ -80,12 +150,19 @@ function cost(price) {
   return /table|chicken|box/i.test(price) ? mid / 2 : mid;
 }
 
-function ageScore(it, age) {
+// How well a place suits the whole group, weighting each age band by how many travelers are in it.
+function ageScore(it, prof) {
   const t = `${it.name} ${it.desc}`;
-  if (age === "young") return (ACTIVE.test(t) ? 2 : 0) + (NIGHT.test(t) ? 1.5 : 0);
-  if (age === "adult") return (ACTIVE.test(t) ? 0.5 : 0) + (RELAX.test(t) ? 0.5 : 0);
-  if (age === "mature") return (RELAX.test(t) ? 1.5 : 0) - (HARD.test(t) ? 1 : 0);
-  return (RELAX.test(t) ? 2 : 0) - (HARD.test(t) ? 3 : 0);
+  const act = ACTIVE.test(t), rel = RELAX.test(t), night = NIGHT.test(t), hard = HARD.test(t);
+  const s = prof.share;
+  let score =
+    s.child * ((FAMILY.test(t) ? 2 : 0) - (night ? 2 : 0)) +
+    s.young * ((act ? 2 : 0) + (night ? 1.5 : 0)) +
+    s.adult * ((act ? 0.5 : 0) + (rel ? 0.5 : 0)) +
+    s.mature * ((rel ? 1.5 : 0) - (hard ? 1 : 0)) +
+    s.senior * (rel ? 2 : 0);
+  if (hard && (prof.hasSenior || prof.hasYoungChild)) score -= 3; // one slow walker sets the pace for everyone
+  return score;
 }
 
 const THEMES = [
@@ -94,28 +171,30 @@ const THEMES = [
     name: "Smart Saver",
     blurb: "Free and low-cost sights, budget stays, local eats.",
     tier: "Budget",
-    score: (it, age) => -cost(it.price) / 15000 + ageScore(it, age),
+    score: (it, prof) => -cost(it.price) / 15000 + ageScore(it, prof),
   },
   {
     key: "classic",
     name: "Classic Comfort",
     blurb: "Heritage sights and a comfortable mid-range hotel.",
     tier: "Mid-range",
-    score: (it, age) => (RELAX.test(`${it.name} ${it.desc}`) ? 1.5 : 0) + ageScore(it, age),
+    score: (it, prof) => (RELAX.test(`${it.name} ${it.desc}`) ? 1.5 : 0) + ageScore(it, prof),
   },
   {
     key: "treat",
     name: "Treat Yourself",
     blurb: "Headline experiences and the best hotel your budget allows.",
     tier: "Luxury",
-    score: (it, age) => cost(it.price) / 40000 + ageScore(it, age),
+    score: (it, prof) => cost(it.price) / 40000 + ageScore(it, prof),
   },
 ];
 
 // Pick `count` items, best score first (with a little randomness), then group by city so days stay local.
-function pick(list, count, score, rand, freeBias) {
+// Places in the cities the traveler asked for (`prefer`) rank first, then the rest of the province fills any gaps.
+const inPrefer = (it, prefer) => prefer.length > 0 && prefer.includes(baseName(it.city));
+function pick(list, count, score, rand, freeBias, prefer = []) {
   const ranked = list
-    .map((it) => ({ it, s: score(it) + rand() * 1.2 - (freeBias ? cost(it.price) / 8000 : 0) }))
+    .map((it) => ({ it, s: score(it) + rand() * 1.2 - (freeBias ? cost(it.price) / 8000 : 0) + (inPrefer(it, prefer) ? 8 : 0) }))
     .sort((a, b) => b.s - a.s)
     .slice(0, count)
     .map((x) => x.it);
@@ -132,43 +211,48 @@ function nearTier(hotels, tier) {
 }
 
 function build(theme, opts, tier, freeBias, rand) {
-  const { age, people, days, regions, mode } = opts;
+  const { prof, people, days, regions, mode } = opts;
   const tr = ASSUMPTIONS.transport[mode];
   const cars = Math.ceil(people / 4);
-  const rooms = Math.ceil(people / 2);
-  const perDayStops = Math.max(1, AGES[age].stops + tr.extraStops);
+  const rooms = Math.ceil(prof.beds / 2);
+  const perDayStops = Math.max(1, prof.stops + tr.extraStops);
   const slots = ["Morning", "Afternoon", "Evening", "Late afternoon"].slice(0, perDayStops);
   if (perDayStops === 4) slots.splice(2, 0, slots.pop());
 
   const base = Math.floor(days / regions.length);
   const extra = days % regions.length;
-  const totals = { flights: ORIGINS[opts.origin].cost, lodging: 0, food: 0, sights: 0, transport: 0 };
+  const totals = { flights: ORIGINS[opts.origin].cost * prof.flight, lodging: 0, food: 0, sights: 0, transport: 0 };
   const segments = [];
 
-  regions.forEach((prov, idx) => {
+  regions.forEach(({ prov, prefer }, idx) => {
     const segDays = base + (idx < extra ? 1 : 0);
     const nights = idx === regions.length - 1 ? Math.max(0, segDays - 1) : segDays;
-    const attractions = pick(prov.attractions || [], segDays * perDayStops, (it) => theme.score(it, age), rand, freeBias);
-    const meals = pick([...(prov.restaurants || []), ...(prov.foods || [])], segDays * 2, (it) => ageScore(it, age), rand, freeBias);
+    const attractions = pick(prov.attractions || [], segDays * perDayStops, (it) => theme.score(it, prof), rand, freeBias, prefer);
+    const meals = pick([...(prov.restaurants || []), ...(prov.foods || [])], segDays * 2, (it) => ageScore(it, prof), rand, freeBias, prefer);
     const lunches = meals.filter((m) => (prov.restaurants || []).includes(m));
     const dinners = meals.filter((m) => !lunches.includes(m));
-    const hotel = nearTier(prov.hotels || [], tier).sort(() => rand() - 0.5)[0];
+    // Hotels in the chosen cities if there are any, otherwise anywhere in the province.
+    const localHotels = (prov.hotels || []).filter((h) => inPrefer(h, prefer));
+    const hotel = nearTier(localHotels.length ? localHotels : prov.hotels || [], tier).sort(() => rand() - 0.5)[0];
+    const label = prefer.length ? `${prov.name} · ${prefer.join(", ")}` : prov.name;
+    const nearby = prefer.length && attractions.some((it) => !inPrefer(it, prefer));
+    const where = prefer.length ? prefer.join(", ") : prov.cities.split(" · ").join(", ");
 
     const dayList = [];
     for (let d = 0; d < segDays; d++) {
       const stops = slots.map((time, i) => {
         const item = attractions[d * perDayStops + i];
         if (item) {
-          totals.sights += cost(item.price);
+          totals.sights += cost(item.price) * prof.sights;
           return { time, kind: "sight", item, price: cost(item.price) };
         }
-        return { time, kind: "free", text: `Free time: wander ${prov.cities.split(" · ").join(", ")} at your own pace.` };
+        return { time, kind: "free", text: `Free time: wander ${where} at your own pace.` };
       });
       const lunch = lunches[d] || dinners[d + segDays] || null;
       const dinner = dinners[d] || lunches[d + segDays] || null;
       const lp = lunch ? cost(lunch.price) : 10000;
       const dp = dinner ? cost(dinner.price) : 10000;
-      totals.food += ASSUMPTIONS.breakfast + lp + dp;
+      totals.food += (ASSUMPTIONS.breakfast + lp + dp) * prof.food;
       dayList.push({
         stops,
         lunch: lunch ? { item: lunch, price: lp } : { text: "Local café or street food", price: lp },
@@ -176,19 +260,24 @@ function build(theme, opts, tier, freeBias, rand) {
       });
     }
     if (hotel) totals.lodging += (nights * rooms * cost(hotel.price)) / people;
-    totals.transport += segDays * (tr.local ?? (tr.localCar * cars) / people);
-    segments.push({ prov, hotel, nights, days: dayList });
+    totals.transport += segDays * (tr.local !== undefined ? tr.local * prof.transit : (tr.localCar * cars) / people);
+    segments.push({ prov, label, nearby, hotel, nights, days: dayList });
   });
 
   // Travel between regions, starting and ending in Seoul (Gyeonggi).
-  const route = ["gyeonggi", ...regions.map((r) => r.id), "gyeonggi"];
+  const route = ["gyeonggi", ...regions.map((r) => r.prov.id), "gyeonggi"];
   let legs = 0;
   for (let i = 1; i < route.length; i++) {
     if (route[i] === route[i - 1]) continue;
     legs++;
     // Jeju is an island, so any leg to or from it is a flight whatever the transport choice.
     const flight = route[i] === "jeju" || route[i - 1] === "jeju";
-    totals.transport += flight ? ASSUMPTIONS.flight : tr.leg ?? (tr.legCar * cars) / people;
+    const byAir = flight || mode === "flight";
+    totals.transport += byAir
+      ? ASSUMPTIONS.flight * prof.flight
+      : tr.leg !== undefined
+        ? tr.leg * prof.transit
+        : (tr.legCar * cars) / people;
   }
 
   const total = totals.flights + totals.lodging + totals.food + totals.sights + totals.transport;
@@ -224,13 +313,16 @@ function transportTips(opts) {
   };
   return tips[opts.mode];
 }
-function ageTip(age) {
-  return {
-    young: "Evenings are free for night markets, cafés and live music, so we kept them open.",
-    adult: "A balanced pace with a mix of sightseeing and downtime.",
-    mature: "Two main stops a day with a long lunch, so there is time to rest.",
-    senior: "Two gentle stops a day, avoiding steep hikes. Ask about senior discounts at ticket counters.",
-  }[age];
+function ageTip(prof) {
+  const ages = prof.ages.join(", ");
+  let tip;
+  if (prof.hasSenior) tip = "Two gentle stops a day and no steep hikes, since someone is 65 or older. Ask about senior discounts at ticket counters.";
+  else if (prof.hasYoungChild) tip = "Two relaxed stops a day with kid-friendly picks like beaches, caves and cable cars. Children under 7 count as free at sights and share a bed.";
+  else if (prof.oldest >= 50) tip = "Two main stops a day with a long lunch, so there is time to rest.";
+  else if (prof.share.young > 0.5) tip = "Three stops a day, with evenings open for night markets, cafés and live music.";
+  else tip = "A balanced pace with a mix of sightseeing and downtime.";
+  const kids = prof.youngest < 13 ? " Kids' prices are estimated: children eat for less, pay about half at sights and trains, and fly cheaper." : "";
+  return `Planned for ages ${ages}. ${tip}${kids}`;
 }
 
 function renderPlan(plan, opts, i) {
@@ -247,7 +339,8 @@ function renderPlan(plan, opts, i) {
   let dayNo = 0;
   const days = plan.segments
     .map((seg) => {
-      const head = `<h4 class="seg-head" style="--accent:${seg.prov.color}">${esc(seg.prov.name)} <span>${esc(seg.prov.ko)}</span></h4>
+      const head = `<h4 class="seg-head" style="--accent:${seg.prov.color}">${esc(seg.label)} <span>${esc(seg.prov.ko)}</span></h4>
+        ${seg.nearby ? `<p class="stay muted">We have few listings in your chosen cities, so some stops are nearby places in ${esc(seg.prov.name)}.</p>` : ""}
         <p class="stay">${
           seg.hotel
             ? `🛏️ Stay: <strong>${esc(seg.hotel.name)}</strong> <span class="badge badge-${esc(seg.hotel.type.toLowerCase())}">${esc(seg.hotel.type)}</span> · ${esc(seg.hotel.price)}/night, ${seg.nights} night${seg.nights === 1 ? "" : "s"}`
@@ -292,24 +385,38 @@ function renderPlan(plan, opts, i) {
 
 function generate() {
   const data = new FormData(form);
-  const regionIds = data.getAll("region");
-  if (regionIds.length === 0) {
-    results.innerHTML = `<p class="warn">Pick at least one region.</p>`;
-    return;
-  }
+  const ages = data.getAll("age").map((a) => Math.min(110, Math.max(0, Math.round(Number(a)) || 0)));
   const opts = {
-    age: data.get("age"),
-    people: Math.min(10, Math.max(1, Number(data.get("people")) || 1)),
+    ages,
+    prof: profile(ages),
+    people: ages.length,
     days: Math.min(14, Math.max(1, Number(data.get("days")) || 1)),
     budget: Math.max(100, Number(data.get("budget")) || 100),
     mode: data.get("mode"),
     origin: data.get("origin") in ORIGINS ? data.get("origin") : "none",
   };
-  let regions = regionIds.map((id) => PROVINCES.find((p) => p.id === id));
+
+  // Work out each stop: a province, plus the cities in it the traveler asked for (none = the whole province).
+  const wanted = new Map(); // province id -> Set of city names
+  const want = (id, city) => {
+    if (!wanted.has(id)) wanted.set(id, new Set());
+    if (city) wanted.get(id).add(city);
+  };
+  data.getAll("region").forEach((id) => want(id));
+  data.getAll("city").forEach((v) => {
+    const [id, city] = v.split("|");
+    if (wanted.has(id)) want(id, city);
+  });
+  data.getAll("special").forEach((name) => want(SPECIAL_HOST[name], name));
+  if (wanted.size === 0) {
+    results.innerHTML = `<p class="warn">Pick at least one place to visit.</p>`;
+    return;
+  }
+  let regions = PROVINCES.filter((pv) => wanted.has(pv.id)).map((prov) => ({ prov, prefer: [...wanted.get(prov.id)] }));
   let notice = "";
   if (regions.length > opts.days) {
     regions = regions.slice(0, opts.days);
-    notice = `<p class="warn">You picked more regions than days, so the plans cover the first ${opts.days}.</p>`;
+    notice = `<p class="warn">You picked more places than days, so the plans cover the first ${opts.days}.</p>`;
   }
   opts.regions = regions;
   const plans = THEMES.map((theme, i) => makePlan(theme, opts, seed * 100 + i + 1));
@@ -326,7 +433,7 @@ function generate() {
     : `Nothing fits this budget, so ${best.theme.name} is the closest. Try fewer days or a higher budget.`;
   results.innerHTML = `
     ${notice}
-    <p class="tips">⭐ ${esc(why)}<br />${opts.origin !== "none" ? `🌏 Includes an estimated ${money(ORIGINS[opts.origin].cost)} per person for flights from ${esc(ORIGINS[opts.origin].label)}.<br />` : ""}${regions.some((r) => r.id === "jeju") ? "✈️ Jeju is reached by plane, and that flight is counted in transport.<br />" : ""}🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.age))}</p>
+    <p class="tips">⭐ ${esc(why)}<br />${opts.origin !== "none" ? `🌏 Includes an estimated ${money(ORIGINS[opts.origin].cost)} per person for flights from ${esc(ORIGINS[opts.origin].label)}.<br />` : ""}${regions.some((r) => r.prov.id === "jeju") ? "✈️ Jeju is reached by plane, and that flight is counted in transport.<br />" : ""}🚆 ${esc(transportTips(opts))}<br />🧭 ${esc(ageTip(opts.prof))}</p>
     <div class="plan-grid">${plans.map((p, i) => renderPlan(p, opts, i)).join("")}</div>
     <p class="actions">
       <button type="button" id="again" class="button button-dark">Show me different plans</button>

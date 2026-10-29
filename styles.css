@@ -1066,3 +1066,32 @@ html {
   margin-top: 20px;
   max-width: 420px;
 }
+
+/* Planner: ages and city picker (v19) */
+.ages {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+.pick-sub {
+  margin: 14px 0 8px;
+  font-size: 0.95rem;
+}
+.pick-sub small,
+.subcities h4 small {
+  font-weight: 400;
+  color: var(--muted);
+}
+.subcities {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #faf7f2;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--accent);
+  border-radius: 12px;
+}
+.subcities[hidden] {
+  display: none;
+}
+.subcities h4 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}

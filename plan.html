@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trip Planner · Korea Travel Guide · 한국 여행 가이드</title>
     <meta name="description" content="Get three trip plans for South Korea based on your age, budget, regions and transportation." />
-    <link rel="stylesheet" href="styles.css?v=18" />
+    <link rel="stylesheet" href="styles.css?v=19" />
   </head>
   <body>
     <nav class="nav">
@@ -26,14 +26,6 @@
     <main class="wrap">
       <form id="plan-form" class="plan-form">
         <div class="field-row">
-          <label>Age group of the group
-            <select name="age">
-              <option value="young">18–29</option>
-              <option value="adult" selected>30–49</option>
-              <option value="mature">50–64</option>
-              <option value="senior">65+</option>
-            </select>
-          </label>
           <label>Travelers
             <input type="number" name="people" min="1" max="10" value="2" />
           </label>
@@ -46,8 +38,17 @@
         </div>
 
         <fieldset>
-          <legend>Where do you want to go? <small>Pick one or more provinces. Seoul is in Gyeonggi and Busan is in Gyeongnam.</small></legend>
+          <legend>How old is each traveler? <small>Ages shape the pace, the activities and some prices, especially for children and seniors</small></legend>
+          <div id="ages" class="field-row ages"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Where do you want to go? <small>Pick special cities, provinces, or both. Tick a province to choose its cities.</small></legend>
+          <h4 class="pick-sub">Special cities <small>특별시 · 광역시</small></h4>
+          <div id="special-places" class="chips"></div>
+          <h4 class="pick-sub">Provinces <small>도</small></h4>
           <div id="regions" class="chips"></div>
+          <div id="subcities"></div>
         </fieldset>
 
         <fieldset>
@@ -85,6 +86,7 @@
     </footer>
 
     <script src="data.js?v=6"></script>
-    <script src="plan.js?v=4"></script>
+    <script src="cities.js?v=4"></script>
+    <script src="plan.js?v=5"></script>
   </body>
 </html>
