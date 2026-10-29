@@ -180,20 +180,21 @@ function build(theme, opts, tier, freeBias, rand) {
 }
 
 function makePlan(theme, opts, planSeed) {
-  const budgetKrw = opts.budget * KRW_PER_USD;
+  const budgetKrw = opts.budget * KRW_PER_USD; // whole group
+  const groupCost = (plan) => plan.total * opts.people;
   const tiers = TIERS.slice(0, TIERS.indexOf(theme.tier) + 1).reverse();
   let plan;
   for (const tier of tiers) {
     plan = build(theme, opts, tier, false, rng(planSeed));
-    if (plan.total <= budgetKrw) return finish(plan, budgetKrw);
+    if (groupCost(plan) <= budgetKrw) return finish(plan, budgetKrw, opts.people);
   }
   plan = build(theme, opts, "Budget", true, rng(planSeed));
-  return finish(plan, budgetKrw);
+  return finish(plan, budgetKrw, opts.people);
 }
 
-function finish(plan, budgetKrw) {
+function finish(plan, budgetKrw, people) {
   plan.budgetKrw = budgetKrw;
-  plan.fits = plan.total <= budgetKrw;
+  plan.fits = plan.total * people <= budgetKrw;
   return plan;
 }
 
@@ -253,8 +254,8 @@ function renderPlan(plan, opts, i) {
     })
     .join("");
   const status = plan.fits
-    ? `<span class="fit ok">Within budget · ${money(plan.budgetKrw - plan.total)} to spare</span>`
-    : `<span class="fit over">Over budget by ${money(plan.total - plan.budgetKrw)}</span>`;
+    ? `<span class="fit ok">Within budget · ${money(plan.budgetKrw - plan.total * opts.people)} to spare</span>`
+    : `<span class="fit over">Over budget by ${money(plan.total * opts.people - plan.budgetKrw)}</span>`;
   return `
     <article class="plan">
       <header class="plan-head">
@@ -282,7 +283,7 @@ function generate() {
     age: data.get("age"),
     people: Math.min(10, Math.max(1, Number(data.get("people")) || 1)),
     days: Math.min(14, Math.max(1, Number(data.get("days")) || 1)),
-    budget: Math.max(50, Number(data.get("budget")) || 50),
+    budget: Math.max(100, Number(data.get("budget")) || 100),
     mode: data.get("mode"),
   };
   let regions = regionIds.map((id) => PROVINCES.find((p) => p.id === id));

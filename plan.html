@@ -40,8 +40,8 @@
           <label>Days
             <input type="number" name="days" min="1" max="14" value="4" />
           </label>
-          <label>Budget per person (USD)
-            <input type="number" name="budget" min="50" step="50" value="1000" />
+          <label>Total budget for the whole group (USD)
+            <input type="number" name="budget" min="100" step="100" value="2000" />
           </label>
         </div>
 
@@ -61,7 +61,7 @@
         </fieldset>
 
         <button type="submit" class="button button-dark">Create my plans →</button>
-        <p class="muted">Budget covers hotels, food, sights and local transport. Flights are not included.</p>
+        <p class="muted">Budget is for everyone together and covers hotels, food, sights and local transport. Flights are not included.</p>
       </form>
 
       <section id="results" aria-live="polite"></section>
@@ -72,6 +72,6 @@
     </footer>
 
     <script src="data.js?v=4"></script>
-    <script src="plan.js?v=1"></script>
+    <script src="plan.js?v=2"></script>
   </body>
 </html>
