@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Korea Travel Guide · 한국 여행 가이드</title>
     <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
-    <link rel="stylesheet" href="styles.css?v=16" />
+    <link rel="stylesheet" href="styles.css?v=17" />
   </head>
-  <body>
+  <body data-page="guide">
     <nav class="nav">
       <div class="wrap">
         <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
@@ -35,13 +35,6 @@
         <h2 id="pick-title" class="section-title">Provinces <span class="ko-inline">도</span></h2>
         <div id="province-grid" class="province-grid"></div>
       </section>
-
-      <section id="detail" class="detail" aria-live="polite"></section>
-
-      <p class="note">
-        Prices are approximate, in Korean won (₩). The USD amounts use a rough rate of ₩<span id="rate"></span> = $1.
-        Prices and opening times change, so check before you go.
-      </p>
     </main>
 
     <footer class="footer">
@@ -51,6 +44,6 @@
     <!-- Bump ?v= after editing so browsers load the new files instead of an old copy -->
     <script src="data.js?v=6"></script>
     <script src="cities.js?v=4"></script>
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
   </body>
 </html>

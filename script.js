@@ -5,11 +5,18 @@ const TABS = [
   { key: "foods", label: "Local food", ko: "먹거리" },
 ];
 
-const grid = document.getElementById("province-grid");
-const detail = document.getElementById("detail");
+// One script powers three pages, chosen by <body data-page="...">:
+//   guide.html    provinces and special cities
+//   province.html?p=gangwon             the cities of one province
+//   city.html?p=gangwon&c=sokcho        one city's attractions, 맛집, places to stay and local food
+// Special cities use p=special, e.g. city.html?p=special&c=seoul.
+const page = document.body.dataset.page;
+const view = document.getElementById("view");
+const query = new URLSearchParams(location.search);
 let currentTab = "attractions";
 
-document.getElementById("rate").textContent = KRW_PER_USD.toLocaleString();
+const rateEl = document.getElementById("rate");
+if (rateEl) rateEl.textContent = KRW_PER_USD.toLocaleString();
 
 // Escape text before putting it into HTML.
 function esc(text) {
@@ -33,33 +40,6 @@ function withUsd(price) {
 // Province photos: images/<id>.svg (e.g. images/gangwon.svg). Item photos: set "image" on the item.
 function photo(src, alt = "") {
   return `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()" />`;
-}
-
-function renderSpecialGrid(activeId) {
-  const grid2 = document.getElementById("special-grid");
-  if (!grid2) return;
-  grid2.innerHTML = specialList
-    .map(
-      (c) => `
-      <a class="province-card special-card${activeId === c.slug ? " active" : ""}" href="#special/${c.slug}" style="--accent:${SPECIAL_COLOR}">
-        <span class="ko">${esc(c.ko)}</span>
-        <span class="en">${esc(c.name)}</span>
-        <span class="cities">${esc(c.type)}</span>
-      </a>`
-    )
-    .join("");
-}
-
-function renderGrid(activeId) {
-  grid.innerHTML = PROVINCES.map(
-    (p) => `
-      <a class="province-card${p.id === activeId ? " active" : ""}" href="#${p.id}" style="--accent:${p.color}">
-        <span class="thumb">${photo(p.image || `images/${p.id}.svg`)}</span>
-        <span class="ko">${esc(p.ko)}</span>
-        <span class="en">${esc(p.name)}</span>
-        <span class="cities">${esc(p.cities)}</span>
-      </a>`
-  ).join("");
 }
 
 // Items are tagged with a city (e.g. "Changwon (Jinhae)"). The part before any bracket is the city name.
@@ -134,8 +114,42 @@ function provinceHead(p) {
     </div>`;
 }
 
-// Step 2: a province shows its cities. Pick one to see its places.
-function renderProvince(p) {
+
+const cityHref = (provId, c) => `city.html?p=${provId}&c=${c.slug}`;
+const countText = (n) => (n ? `${n} place${n === 1 ? "" : "s"}` : "Coming soon");
+
+// Page 1: guide.html lists the special cities and the provinces.
+function renderGuide() {
+  document.getElementById("special-grid").innerHTML = specialList
+    .map(
+      (c) => `
+      <a class="province-card special-card" href="${cityHref("special", c)}" style="--accent:${SPECIAL_COLOR}">
+        <span class="ko">${esc(c.ko)}</span>
+        <span class="en">${esc(c.name)}</span>
+        <span class="cities">${esc(c.type)} · ${countText(placesIn(specialProvince, c.name))}</span>
+      </a>`
+    )
+    .join("");
+  document.getElementById("province-grid").innerHTML = PROVINCES.map(
+    (p) => `
+      <a class="province-card" href="province.html?p=${p.id}" style="--accent:${p.color}">
+        <span class="thumb">${photo(p.image || `images/${p.id}.svg`)}</span>
+        <span class="ko">${esc(p.ko)}</span>
+        <span class="en">${esc(p.name)}</span>
+        <span class="cities">${esc(p.cities)}</span>
+      </a>`
+  ).join("");
+}
+
+function notFound(text) {
+  view.innerHTML = `<p class="hint">${esc(text)} <a href="guide.html">Back to the guide</a></p>`;
+}
+
+// Page 2: province.html lists the cities of one province.
+function renderProvince() {
+  const p = PROVINCES.find((x) => x.id === query.get("p"));
+  if (!p) return notFound("We could not find that province.");
+  document.title = `${p.name} · Korea Travel Guide`;
   const all = placesOf(p);
   const group = (title, list) =>
     list.length
@@ -143,15 +157,16 @@ function renderProvince(p) {
          <div class="city-cards">${list
            .map((c) => {
              const n = placesIn(p, c.name);
-             return `<a class="city-card${n ? "" : " empty-city"}" href="#${p.id}/${c.slug}">
+             return `<a class="city-card${n ? "" : " empty-city"}" href="${cityHref(p.id, c)}">
                <span class="name">${esc(baseName(c.name))}</span>
                <span class="ko">${esc(c.ko)}</span>
-               <span class="count">${n ? `${n} place${n === 1 ? "" : "s"}` : "Coming soon"}</span>
+               <span class="count">${countText(n)}</span>
              </a>`;
            })
            .join("")}</div>`
       : "";
-  detail.innerHTML = `
+  view.innerHTML = `
+    <p class="crumbs"><a href="guide.html">← All provinces</a></p>
     ${provinceHead(p)}
     <div class="city-panel" style="--accent:${p.color}">
       <h3 class="pick-title">Choose a city in ${esc(p.name)}</h3>
@@ -160,44 +175,26 @@ function renderProvince(p) {
     </div>`;
 }
 
-function renderSpecialList() {
-  const cards = specialList
-    .map((c) => {
-      const n = placesIn(specialProvince, c.name);
-      return `<a class="city-card${n ? "" : " empty-city"}" href="#special/${c.slug}">
-        <span class="name">${esc(c.name)}</span>
-        <span class="ko">${esc(c.ko)}</span>
-        <span class="count">${n ? `${n} place${n === 1 ? "" : "s"}` : "Coming soon"}</span>
-        <span class="kind">${esc(c.type)}</span>
-      </a>`;
-    })
-    .join("");
-  detail.innerHTML = `
-    <div class="detail-head" style="--accent:${SPECIAL_COLOR}">
-      <div class="detail-text">
-        <h3>Special cities <span>특별시 · 광역시 · 특별자치시</span></h3>
-        <p>Seoul, the six metropolitan cities and Sejong are governed on their own, apart from the provinces.</p>
-      </div>
-    </div>
-    <div class="city-panel" style="--accent:${SPECIAL_COLOR}">
-      <h3 class="pick-title">Choose a special city</h3>
-      <div class="city-cards">${cards}</div>
-    </div>`;
-}
+// Page 3: city.html shows a city's attractions, 맛집, places to stay and local food.
+function renderCity() {
+  const provId = query.get("p");
+  const p = provId === "special" ? specialProvince : PROVINCES.find((x) => x.id === provId);
+  const city = p && (provId === "special" ? specialList : placesOf(p)).find((c) => c.slug === query.get("c"));
+  if (!city) return notFound("We could not find that city.");
+  document.title = `${baseName(city.name)} · Korea Travel Guide`;
 
-// Step 3: a city shows its attractions, hotels, local food and restaurants.
-function renderCity(p, city) {
-  const first = TABS.find((t) => (p[t.key] || []).some((it) => inCity(it, city.name)));
-  if (!TABS.some((t) => t.key === currentTab && (p[t.key] || []).some((it) => inCity(it, city.name)))) {
-    currentTab = first ? first.key : "attractions";
-  }
+  const has = (key) => (p[key] || []).some((it) => inCity(it, city.name));
+  if (!has(currentTab)) currentTab = TABS.find((t) => has(t.key))?.key ?? "attractions";
   const total = placesIn(p, city.name);
-  detail.innerHTML = `
-    <p class="crumbs"><a href="#${p.id}">← ${esc(p.name)}</a></p>
+  const back = provId === "special" ? `<a href="guide.html">← All special cities</a>` : `<a href="province.html?p=${p.id}">← ${esc(p.name)}</a>`;
+  const where = provId === "special" ? esc(city.kind) : `${esc(city.kind)} · ${esc(p.name)}`;
+
+  view.innerHTML = `
+    <p class="crumbs">${back}</p>
     <div class="detail-head city-head" style="--accent:${p.color}">
       <div class="detail-text">
         <h3>${esc(baseName(city.name))} <span>${esc(city.ko)}</span></h3>
-        <p class="cities">${esc(city.kind)} · ${esc(p.name)}</p>
+        <p class="cities">${where}</p>
         ${total ? "" : `<p>We have not added places for ${esc(baseName(city.name))} yet. Try the map link below, or pick a nearby city.</p>
           <p><a class="map-link" href="https://map.naver.com/p/search/${encodeURIComponent(city.ko)}" target="_blank" rel="noopener">Search ${esc(baseName(city.name))} on Naver Map</a></p>`}
       </div>
@@ -213,39 +210,12 @@ function renderCity(p, city) {
     </div>
     <div class="tab-panel" role="tabpanel">${renderItems(p, city, currentTab)}</div>`;
 
-  detail.querySelectorAll("[data-tab]").forEach((btn) =>
+  view.querySelectorAll("[data-tab]").forEach((btn) =>
     btn.addEventListener("click", () => {
       currentTab = btn.dataset.tab;
-      renderCity(p, city);
+      renderCity();
     })
   );
 }
 
-// The choice lives in the URL: #gangwon shows its cities, #gangwon/sokcho shows one city. Links can be shared.
-function route() {
-  const [provId, citySlug] = location.hash.slice(1).split("/");
-  const province = PROVINCES.find((p) => p.id === provId);
-  renderGrid(province?.id);
-  renderSpecialGrid(provId === "special" ? citySlug : null);
-  if (provId === "special") {
-    const special = citySlug && specialList.find((c) => c.slug === citySlug);
-    if (special) renderCity(specialProvince, special);
-    else renderSpecialList();
-    detail.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-  if (!province) {
-    detail.innerHTML = `<p class="hint">👆 Pick a province above, then a city, to see where to go, stay and eat.</p>`;
-    return;
-  }
-  const city = citySlug && placesOf(province).find((c) => c.slug === citySlug);
-  if (city) renderCity(province, city);
-  else renderProvince(province);
-  detail.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-window.addEventListener("hashchange", () => {
-  currentTab = "attractions";
-  route();
-});
-route();
+({ guide: renderGuide, province: renderProvince, city: renderCity })[page]();

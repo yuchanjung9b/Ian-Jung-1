@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>한반도 · Provinces and Cities of South Korea</title>
     <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
-    <link rel="stylesheet" href="styles.css?v=15" />
+    <link rel="stylesheet" href="styles.css?v=17" />
   </head>
   <body>
     <nav class="nav">
@@ -64,7 +64,7 @@
       // Each city name opens that city's attractions, 맛집, places to stay and local food in the guide.
       const slug = (n) => n.replace(/ \(.*\)/, "").toLowerCase().replace(/\s+/g, "-");
       const city = (en, ko, lat, lng, extra = "", group = "") =>
-        `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><a class="city-link" href="guide.html#${group}/${slug(en)}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span></a>${extra}${where(lat, lng)}</li>`;
+        `<li class="city" data-q="${esc((en + " " + ko).toLowerCase())}"><a class="city-link" href="city.html?p=${group}&c=${slug(en)}"><b>${esc(en.replace(/ \(.*\)/, ""))}</b> <span>${esc(ko)}</span></a>${extra}${where(lat, lng)}</li>`;
 
       // Dot map: every city plotted by latitude and longitude (no coastline, just positions).
       const X = (lng) => ((lng - 125.9) * 81).toFixed(1);
