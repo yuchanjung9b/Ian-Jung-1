@@ -199,6 +199,11 @@ body {
   font-weight: 700;
   color: var(--red);
 }
+.item .source {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
 .usd {
   font-weight: 500;
   color: var(--muted);

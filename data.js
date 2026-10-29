@@ -7,6 +7,7 @@
 //   hotels:      { name, ko, type: "Luxury" | "Mid-range" | "Budget", desc, price }  (price = per night, double room)
 //   foods:       { name, ko, desc, price }   (price = per person)
 //   restaurants: { name, ko, desc, price }   (price = per person)
+// Optional on any item: city (shown under the name) and source (shown as a small credit).
 
 const PROVINCES = [
   {
@@ -248,9 +249,31 @@ const PROVINCES = [
       { name: "Fresh raw fish", ko: "회", desc: "Choose your fish at the market and eat it upstairs.", price: "₩30,000–60,000" },
     ],
     restaurants: [
-      { name: "Jagalchi Fish Market", ko: "자갈치시장", desc: "Korea's largest seafood market.", price: "₩30,000–60,000" },
-      { name: "Ssangdungi Dwaeji Gukbap", ko: "쌍둥이돼지국밥", desc: "Popular pork soup restaurant near Daeyeon Station.", price: "₩10,000–13,000" },
-      { name: "Gaegeum Milmyeon", ko: "개금밀면", desc: "One of Busan's best-known milmyeon shops.", price: "₩9,000–11,000" },
+      { name: "Jagalchi Fish Market", ko: "자갈치시장", city: "Busan", desc: "Korea's largest seafood market.", price: "₩30,000–60,000" },
+      { name: "Ssangdungi Dwaeji Gukbap", ko: "쌍둥이돼지국밥", city: "Busan", desc: "Popular pork soup restaurant near Daeyeon Station.", price: "₩10,000–13,000" },
+      { name: "Gaegeum Milmyeon", ko: "개금밀면", city: "Busan", desc: "One of Busan's best-known milmyeon shops.", price: "₩9,000–11,000" },
+      // Top-ranked Gyeongnam restaurants from DiningCode (diningcode.com/rank/경남), Oct 2026.
+      // Prices are typical ranges for the signature dish, not from DiningCode.
+      { name: "Bamtol", ko: "밤톨", city: "Hadong", desc: "Bakery known for chestnut pies made with local Hadong chestnuts. A popular souvenir snack.", price: "~₩3,000–15,000", source: "DiningCode" },
+      { name: "Hwajeong Soba", ko: "화정소바", city: "Uiryeong", desc: "Long-running soba shop with warm and cold buckwheat noodles. Certified as a 'Century Store' (백년가게).", price: "~₩10,000–13,000", source: "DiningCode" },
+      { name: "Hiphansik", ko: "힙한식", city: "Namhae", desc: "Modern Korean spot serving pot rice (sotbap) and seafood pancakes. Seen on the show Culinary Class Wars. Expect a wait.", price: "~₩18,000–28,000", source: "DiningCode" },
+      { name: "Dongpirang Jeonbok Maeul", ko: "동피랑전복마을", city: "Tongyeong", desc: "Abalone stone-pot rice sets with grilled fish and pancakes, near Dongpirang mural village.", price: "~₩18,000–30,000", source: "DiningCode" },
+      { name: "Osong Wave", ko: "오송웨이브", city: "Geoje", desc: "Large seaside café with bakery, terrace and ocean views.", price: "~₩6,000–10,000", source: "DiningCode" },
+      { name: "Phosong", ko: "포숑", city: "Changwon (Garosu-gil)", desc: "Busy Vietnamese restaurant known for rich beef pho.", price: "~₩10,000–14,000", source: "DiningCode" },
+      { name: "Dongbu Hoe Center", ko: "동부회센타", city: "Jinhae", desc: "Local raw-fish restaurant with platters, fresh sea squirt and spicy fish stew (maeuntang). Table charge applies.", price: "~₩25,000–40,000", source: "DiningCode" },
+      { name: "Hajuok", ko: "하주옥", city: "Sacheon", desc: "Well-known spot for Jinju-style naengmyeon (cold noodles in seafood broth) with beef jeon.", price: "~₩12,000–16,000", source: "DiningCode" },
+      { name: "Chungnam Sikdang", ko: "충남식당", city: "Geoje", desc: "Simple local gukbap house famous for tender offal and sundae soup.", price: "~₩9,000–12,000", source: "DiningCode" },
+      { name: "Namhae Jeonbok Mulhoe", ko: "남해전복물회", city: "Namhae", desc: "Cold, spicy raw-fish soup topped with fresh abalone. Great in summer.", price: "~₩18,000–25,000", source: "DiningCode" },
+      { name: "Jeil Sikdang", ko: "제일식당", city: "Jinju", desc: "Old market restaurant serving Jinju-style beef tartare bibimbap and blood-sausage soup. Featured on Baekban Gihaeng.", price: "~₩10,000–15,000", source: "DiningCode" },
+      { name: "Won Dwaeji Gukbap", ko: "원돼지국밥", city: "Changwon", desc: "Called one of Changwon's top 3 pork soup restaurants. Lines move fast.", price: "~₩10,000–12,000", source: "DiningCode" },
+      { name: "Mura", ko: "무라", city: "Yangsan", desc: "Japanese ramen shop serving Kumamoto ramen (the spicy one is very spicy) and mazesoba.", price: "~₩10,000–13,000", source: "DiningCode" },
+      { name: "Jinju Naengmyeon Sanhong", ko: "진주냉면 산홍 본점", city: "Jinju", desc: "Main branch of a famous Jinju naengmyeon restaurant, with thick noodles and generous toppings.", price: "~₩12,000–16,000", source: "DiningCode" },
+      { name: "Monster Roasters", ko: "몬스터로스터스", city: "Masan", desc: "Roastery café with coffee tastings and desserts. Blue Ribbon listed.", price: "~₩5,000–9,000", source: "DiningCode" },
+      { name: "Simgane Haemul Jjamppong", ko: "심가네해물짬뽕", city: "Tongyeong", desc: "Spicy seafood noodle soup loaded with shellfish. A certified 'Century Store'.", price: "~₩10,000–15,000", source: "DiningCode" },
+      { name: "Bangkok Sanjang", ko: "방콕산장", city: "Jinhae", desc: "Thai restaurant with a garden setting, popular for dates.", price: "~₩12,000–20,000", source: "DiningCode" },
+      { name: "Daepunggwan", ko: "대풍관", city: "Tongyeong", desc: "Abalone pot rice and oyster dishes, neatly served. Featured on 2 Days & 1 Night.", price: "~₩20,000–35,000", source: "DiningCode" },
+      { name: "Jangsabu", ko: "장사부", city: "Miryang", desc: "Popular Korean-Chinese restaurant for jjajangmyeon and spicy Chinese-style bibimbap.", price: "~₩8,000–13,000", source: "DiningCode" },
+      { name: "Basak Kkwabaegi", ko: "바삭꽈배기", city: "Geoje", desc: "Chewy rice-flour twisted doughnuts, including a green-onion version. Sells out in the afternoon.", price: "~₩1,000–3,000 each", source: "DiningCode" },
     ],
   },
 ];

@@ -51,11 +51,12 @@ function renderItems(p, key) {
       (it) => `
         <li class="item">
           <div class="item-head">
-            <h4>${esc(it.name)} <span class="item-ko">${esc(it.ko)}</span></h4>
+            <h4>${esc(it.name)} <span class="item-ko">${esc(it.ko)}${it.city ? ` · 📍 ${esc(it.city)}` : ""}</span></h4>
             ${it.type ? `<span class="badge badge-${esc(it.type.toLowerCase())}">${esc(it.type)}</span>` : ""}
           </div>
           <p>${esc(it.desc)}</p>
           <p class="price">${withUsd(it.price)}</p>
+          ${it.source ? `<p class="source">Source: ${esc(it.source)}</p>` : ""}
         </li>`
     )
     .join("")}</ul>`;
