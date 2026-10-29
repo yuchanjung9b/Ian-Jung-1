@@ -8,7 +8,6 @@ const TABS = [
 const grid = document.getElementById("province-grid");
 const detail = document.getElementById("detail");
 let currentTab = "attractions";
-let currentCity = null; // city name chosen in the city list, or null for all
 
 document.getElementById("rate").textContent = KRW_PER_USD.toLocaleString();
 
@@ -48,38 +47,28 @@ function renderGrid(activeId) {
   ).join("");
 }
 
-// Items tagged with a city (e.g. "Changwon (Garosu-gil)") belong to that city.
-const inCity = (it, city) => !!it.city && it.city.startsWith(city.replace(/ \(.*\)/, ""));
+// Items are tagged with a city (e.g. "Changwon (Jinhae)"). The part before any bracket is the city name.
+const baseName = (name) => (name ?? "").replace(/ \(.*\)/, "");
+const slug = (name) => baseName(name).toLowerCase().replace(/\s+/g, "-");
+const inCity = (it, name) => baseName(it.city) === baseName(name);
+const placesIn = (p, name) => TABS.reduce((n, t) => n + (p[t.key] || []).filter((it) => inCity(it, name)).length, 0);
 
-function renderCities(p) {
+// Cities, counties and nearby special cities that belong to a province, in the order they are shown.
+function placesOf(p) {
   const entry = PROVINCE_CITIES.find((c) => c.guide === p.id);
-  if (!entry) return "";
-  const tagged = (name) => TABS.reduce((n, t) => n + (p[t.key] || []).filter((it) => inCity(it, name)).length, 0);
-  const chip = (name, ko) => {
-    const n = tagged(name);
-    const label = `${esc(name.replace(/ \(.*\)/, ""))} <small>${esc(ko)}</small>${n ? ` <b>${n}</b>` : ""}`;
-    return n
-      ? `<button type="button" class="city-chip" data-city="${esc(name)}" aria-pressed="${currentCity === name}">${label}</button>`
-      : `<span class="city-chip plain">${label}</span>`;
-  };
-  const nearby = (entry.nearby || [])
-    .map((n) => SPECIAL_CITIES.find((s) => s.name === n))
-    .filter(Boolean);
-  return `
-    <div class="city-panel" style="--accent:${p.color}">
-      <h4>Cities in ${esc(p.name)} <small>${entry.cities.length}</small>
-        ${currentCity ? `<button type="button" class="city-clear" data-city="">Show all</button>` : ""}</h4>
-      <div class="city-chips">${entry.cities.map(([en, ko]) => chip(en, ko)).join("")}</div>
-      ${nearby.length ? `<h4 class="special-label">Special cities nearby</h4><div class="city-chips">${nearby.map((s) => chip(s.name, s.ko)).join("")}</div>` : ""}
-      <p class="city-hint">Cities with a number have places listed here. Select one to filter.</p>
-    </div>`;
+  if (!entry) return [];
+  const special = (entry.nearby || []).map((n) => SPECIAL_CITIES.find((s) => s.name === n)).filter(Boolean);
+  return [
+    ...entry.cities.map(([name, ko]) => ({ name, ko, kind: "City" })),
+    ...(entry.counties || []).map(([name, ko]) => ({ name, ko, kind: "County" })),
+    ...special.map((s) => ({ name: s.name, ko: s.ko, kind: s.type })),
+  ].map((c) => ({ ...c, slug: slug(c.name) }));
 }
 
-function renderItems(p, key) {
-  const all = p[key] || [];
-  const items = currentCity ? all.filter((it) => inCity(it, currentCity)) : all;
-  if (all.length === 0) return `<p class="empty">Coming soon.</p>`;
-  if (items.length === 0) return `<p class="empty">Nothing listed in ${esc(currentCity)} for this tab yet.</p>`;
+function renderItems(p, city, key) {
+  const items = (p[key] || []).filter((it) => inCity(it, city.name));
+  const label = TABS.find((t) => t.key === key).label.toLowerCase();
+  if (items.length === 0) return `<p class="empty">No ${label} listed for ${esc(baseName(city.name))} yet.</p>`;
   return `<ul class="items">${items
     .map(
       (it) => `
@@ -87,7 +76,7 @@ function renderItems(p, key) {
           ${it.image ? `<div class="item-photo">${photo(it.image, it.name)}</div>` : ""}
           <div class="item-body">
           <div class="item-head">
-            <h4>${esc(it.name)} <span class="item-ko">${esc(it.ko)}${it.city ? ` · 📍 ${esc(it.city)}` : ""}</span></h4>
+            <h4>${esc(it.name)} <span class="item-ko">${esc(it.ko)}</span></h4>
             ${it.type ? `<span class="badge badge-${esc(it.type.toLowerCase())}">${esc(it.type)}</span>` : ""}
           </div>
           <p>${esc(it.desc)}</p>
@@ -101,12 +90,8 @@ function renderItems(p, key) {
     .join("")}</ul>`;
 }
 
-function renderDetail(p) {
-  if (!p) {
-    detail.innerHTML = `<p class="hint">👆 Pick a province above to see where to go, stay and eat.</p>`;
-    return;
-  }
-  detail.innerHTML = `
+function provinceHead(p) {
+  return `
     <div class="detail-head" style="--accent:${p.color}">
       ${photo(p.image || `images/${p.id}.svg`)}
       <div class="detail-text">
@@ -114,48 +99,89 @@ function renderDetail(p) {
       <p class="cities">${esc(p.cities)}</p>
       <p>${esc(p.intro)}</p>
       </div>
-    </div>
-    ${renderCities(p)}
-    <div class="tabs" role="tablist">
-      ${TABS.map(
-        (t) => `
-          <button role="tab" type="button" data-tab="${t.key}" aria-selected="${t.key === currentTab}">
-            ${t.label} <small>${t.ko}</small>
-          </button>`
-      ).join("")}
-    </div>
-    <div class="tab-panel" role="tabpanel">${renderItems(p, currentTab)}</div>`;
+    </div>`;
+}
 
-  detail.querySelectorAll("[data-city]").forEach((btn) =>
-    btn.addEventListener("click", () => {
-      currentCity = btn.dataset.city && btn.dataset.city !== currentCity ? btn.dataset.city : null;
-      // Jump to the first tab that has places in this city, so the list is never empty.
-      if (currentCity && !(p[currentTab] || []).some((it) => inCity(it, currentCity))) {
-        currentTab = TABS.find((t) => (p[t.key] || []).some((it) => inCity(it, currentCity)))?.key ?? currentTab;
-      }
-      renderDetail(p);
-    })
-  );
+// Step 2: a province shows its cities. Pick one to see its places.
+function renderProvince(p) {
+  const all = placesOf(p);
+  const group = (title, list) =>
+    list.length
+      ? `<h4 class="city-group-title">${title} <small>${list.length}</small></h4>
+         <div class="city-cards">${list
+           .map((c) => {
+             const n = placesIn(p, c.name);
+             return `<a class="city-card${n ? "" : " empty-city"}" href="#${p.id}/${c.slug}">
+               <span class="name">${esc(baseName(c.name))}</span>
+               <span class="ko">${esc(c.ko)}</span>
+               <span class="count">${n ? `${n} place${n === 1 ? "" : "s"}` : "Coming soon"}</span>
+             </a>`;
+           })
+           .join("")}</div>`
+      : "";
+  detail.innerHTML = `
+    ${provinceHead(p)}
+    <div class="city-panel" style="--accent:${p.color}">
+      <h3 class="pick-title">Choose a city in ${esc(p.name)}</h3>
+      ${group("Cities", all.filter((c) => c.kind === "City"))}
+      ${group("Counties with listings", all.filter((c) => c.kind === "County"))}
+      ${group("Special cities nearby", all.filter((c) => c.kind !== "City" && c.kind !== "County"))}
+    </div>`;
+}
+
+// Step 3: a city shows its attractions, hotels, local food and restaurants.
+function renderCity(p, city) {
+  const first = TABS.find((t) => (p[t.key] || []).some((it) => inCity(it, city.name)));
+  if (!TABS.some((t) => t.key === currentTab && (p[t.key] || []).some((it) => inCity(it, city.name)))) {
+    currentTab = first ? first.key : "attractions";
+  }
+  const total = placesIn(p, city.name);
+  detail.innerHTML = `
+    <p class="crumbs"><a href="#${p.id}">← ${esc(p.name)}</a></p>
+    <div class="detail-head city-head" style="--accent:${p.color}">
+      <div class="detail-text">
+        <h3>${esc(baseName(city.name))} <span>${esc(city.ko)}</span></h3>
+        <p class="cities">${esc(city.kind)} · ${esc(p.name)}</p>
+        ${total ? "" : `<p>We have not added places for ${esc(baseName(city.name))} yet. Try the map link below, or pick a nearby city.</p>
+          <p><a class="map-link" href="https://map.naver.com/p/search/${encodeURIComponent(city.ko)}" target="_blank" rel="noopener">Search ${esc(baseName(city.name))} on Naver Map</a></p>`}
+      </div>
+    </div>
+    <div class="tabs" role="tablist">
+      ${TABS.map((t) => {
+        const n = (p[t.key] || []).filter((it) => inCity(it, city.name)).length;
+        return `
+          <button role="tab" type="button" data-tab="${t.key}" aria-selected="${t.key === currentTab}">
+            ${t.label} <small>${t.ko}</small> <span class="tab-count">${n}</span>
+          </button>`;
+      }).join("")}
+    </div>
+    <div class="tab-panel" role="tabpanel">${renderItems(p, city, currentTab)}</div>`;
+
   detail.querySelectorAll("[data-tab]").forEach((btn) =>
     btn.addEventListener("click", () => {
       currentTab = btn.dataset.tab;
-      renderDetail(p);
+      renderCity(p, city);
     })
   );
 }
 
-// The selected province lives in the URL (e.g. #gangwon), so links can be shared.
+// The choice lives in the URL: #gangwon shows its cities, #gangwon/sokcho shows one city. Links can be shared.
 function route() {
-  const id = location.hash.slice(1);
-  const province = PROVINCES.find((p) => p.id === id);
+  const [provId, citySlug] = location.hash.slice(1).split("/");
+  const province = PROVINCES.find((p) => p.id === provId);
   renderGrid(province?.id);
-  renderDetail(province);
-  if (province) detail.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!province) {
+    detail.innerHTML = `<p class="hint">👆 Pick a province above, then a city, to see where to go, stay and eat.</p>`;
+    return;
+  }
+  const city = citySlug && placesOf(province).find((c) => c.slug === citySlug);
+  if (city) renderCity(province, city);
+  else renderProvince(province);
+  detail.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 window.addEventListener("hashchange", () => {
   currentTab = "attractions";
-  currentCity = null;
   route();
 });
 route();
