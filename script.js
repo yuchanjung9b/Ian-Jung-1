@@ -1,6 +1,3 @@
-// Rough exchange rate used to show USD next to KRW prices. Update when needed.
-const KRW_PER_USD = 1400;
-
 const TABS = [
   { key: "attractions", label: "Attractions", ko: "관광지" },
   { key: "hotels", label: "Hotels", ko: "호텔" },

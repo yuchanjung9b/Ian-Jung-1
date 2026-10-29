@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trip Planner · Korea Travel Guide · 한국 여행 가이드</title>
+    <meta name="description" content="Get three trip plans for South Korea based on your age, budget, regions and transportation." />
+    <link rel="stylesheet" href="styles.css?v=7" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
+        <span class="nav-links"><a href="guide.html">Provinces</a> <a href="plan.html">Trip planner</a></span>
+      </div>
+    </nav>
+
+    <header class="hero hero-small">
+      <div class="wrap hero-inner">
+        <p class="eyebrow">여행 플래너</p>
+        <h1>Plan my trip</h1>
+        <p class="lead">Tell us a little about your trip and get three plans to compare, with day-by-day stops and a cost estimate.</p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <form id="plan-form" class="plan-form">
+        <div class="field-row">
+          <label>Age group
+            <select name="age">
+              <option value="young">18–29</option>
+              <option value="adult" selected>30–49</option>
+              <option value="mature">50–64</option>
+              <option value="senior">65+</option>
+            </select>
+          </label>
+          <label>Travelers
+            <input type="number" name="people" min="1" max="10" value="2" />
+          </label>
+          <label>Days
+            <input type="number" name="days" min="1" max="14" value="4" />
+          </label>
+          <label>Budget per person (USD)
+            <input type="number" name="budget" min="50" step="50" value="1000" />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Where do you want to go? <small>Pick one or more</small></legend>
+          <div id="regions" class="chips"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>How will you get around?</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="mode" value="ktx" checked /><span>🚄 KTX + subway</span></label>
+            <label class="chip"><input type="radio" name="mode" value="bus" /><span>🚌 Intercity bus</span></label>
+            <label class="chip"><input type="radio" name="mode" value="car" /><span>🚗 Rental car</span></label>
+            <label class="chip"><input type="radio" name="mode" value="taxi" /><span>🚕 Taxi / driver</span></label>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="button button-dark">Create my plans →</button>
+        <p class="muted">Budget covers hotels, food, sights and local transport. Flights are not included.</p>
+      </form>
+
+      <section id="results" aria-live="polite"></section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap"><a href="index.html">Home</a> · Korea Travel Guide · 한국 여행 가이드</div>
+    </footer>
+
+    <script src="data.js?v=4"></script>
+    <script src="plan.js?v=1"></script>
+  </body>
+</html>

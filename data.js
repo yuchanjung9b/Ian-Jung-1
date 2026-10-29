@@ -10,6 +10,9 @@
 // Optional on any item: city (shown under the name), address (shown with a map link)
 // and source (shown as a small credit).
 
+// Rough exchange rate used to show USD next to KRW prices. Update when needed.
+const KRW_PER_USD = 1400;
+
 const PROVINCES = [
   {
     id: "gyeonggi",
