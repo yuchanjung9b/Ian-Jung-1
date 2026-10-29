@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search places · Korea Travel Guide · 한국 여행 가이드</title>
+    <meta name="description" content="Search every attraction, restaurant, hotel and local dish in the guide." />
+    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="site.css?v=1" />
+  </head>
+  <body>
+    <script src="site.js?v=1"></script>
+
+    <header class="hero hero-small">
+      <div class="wrap hero-inner">
+        <p class="eyebrow">검색</p>
+        <h1>Search places</h1>
+        <p class="lead">Find attractions, 맛집, places to stay and local food across all of Korea.</p>
+      </div>
+    </header>
+
+    <main id="main" class="wrap">
+      <form class="search-box" id="search-form" role="search">
+        <input type="search" id="q" placeholder="Try temple, bibimbap, Busan, 해운대" autocomplete="off" aria-label="Search" />
+      </form>
+      <div class="filters" id="filters"></div>
+      <p class="result-count" id="count" aria-live="polite"></p>
+      <ul class="result-grid" id="results"></ul>
+      <p class="note">Prices are approximate, in Korean won (₩), and change often. Check before you go.</p>
+    </main>
+
+    <script src="data.js?v=6"></script>
+    <script src="cities.js?v=4"></script>
+    <script src="search.js?v=1"></script>
+  </body>
+</html>

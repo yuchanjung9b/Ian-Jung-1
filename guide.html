@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Korea Travel Guide · 한국 여행 가이드</title>
     <meta name="description" content="Attractions, hotels, food, restaurants and prices for every province in South Korea." />
-    <link rel="stylesheet" href="styles.css?v=19" />
+    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="site.css?v=1" />
   </head>
   <body data-page="guide">
-    <nav class="nav">
-      <div class="wrap">
-        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
-        <span class="nav-links"><a href="index.html">Home</a> <a href="guide.html">Guide</a> <a href="plan.html">Trip planner</a> <a href="hanbando.html">한반도</a></span>
-      </div>
-    </nav>
+    <script src="site.js?v=1"></script>
 
     <header class="hero">
       <div class="wrap">
@@ -25,8 +21,8 @@
       </div>
     </header>
 
-    <main class="wrap">
-      <section aria-labelledby="special-title">
+    <main id="main" class="wrap">
+      <section id="special" aria-labelledby="special-title">
         <h2 id="special-title" class="section-title">Special cities <span class="ko-inline">특별시 · 광역시</span></h2>
         <div id="special-grid" class="province-grid"></div>
       </section>
@@ -37,9 +33,6 @@
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="wrap"><a href="index.html">Home</a> · Korea Travel Guide · 한국 여행 가이드</div>
-    </footer>
 
     <!-- Bump ?v= after editing so browsers load the new files instead of an old copy -->
     <script src="data.js?v=6"></script>

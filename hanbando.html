@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>한반도 · Provinces and Cities of South Korea</title>
     <meta name="description" content="All provinces and cities of South Korea and where each city belongs, with special cities listed separately." />
-    <link rel="stylesheet" href="styles.css?v=19" />
+    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="site.css?v=1" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="wrap">
-        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
-        <span class="nav-links"><a href="index.html">Home</a> <a href="guide.html">Guide</a> <a href="plan.html">Trip planner</a> <a href="hanbando.html">한반도</a></span>
-      </div>
-    </nav>
+    <script src="site.js?v=1"></script>
 
     <header class="hero hero-small">
       <div class="wrap hero-inner">
@@ -23,14 +19,14 @@
       </div>
     </header>
 
-    <main class="wrap">
+    <main id="main" class="wrap">
       <p class="count-line" id="count-line"></p>
       <label class="city-search">Find a city
         <input type="search" id="city-search" placeholder="Type a name in English or Korean" autocomplete="off" />
       </label>
       <nav class="jump" id="jump" aria-label="Jump to a province"></nav>
 
-      <section class="map-block" aria-labelledby="map-title">
+      <section id="map" class="map-block" aria-labelledby="map-title">
         <h2 id="map-title" class="section-title">Where the cities are</h2>
         <div id="map" class="map"></div>
       </section>
@@ -45,9 +41,6 @@
       </p>
     </main>
 
-    <footer class="footer">
-      <div class="wrap"><a href="index.html">Home</a> · Korea Travel Guide · 한국 여행 가이드</div>
-    </footer>
 
     <script src="data.js?v=6"></script>
     <script src="cities.js?v=4"></script>

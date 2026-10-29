@@ -4,87 +4,135 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Korea Travel Guide · 한국 여행 가이드</title>
-    <meta name="description" content="Plan your trip to South Korea: what to see, where to stay, what to eat and what it costs, province by province." />
-    <link rel="stylesheet" href="styles.css?v=19" />
+    <meta name="description" content="Plan your trip to South Korea: provinces, cities, attractions, food, places to stay and a trip planner that fits your budget." />
+    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="site.css?v=1" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="wrap">
-        <a class="brand" href="index.html">Korea Travel Guide <span>한국 여행 가이드</span></a>
-        <span class="nav-links"><a href="guide.html">Guide</a> <a href="plan.html">Trip planner</a> <a href="hanbando.html">한반도</a></span>
-      </div>
-    </nav>
+    <script src="site.js?v=1"></script>
 
-    <header class="hero">
-      <div class="wrap hero-inner">
-        <p class="eyebrow">대한민국 여행 가이드</p>
-        <h1>Plan your trip to South Korea</h1>
-        <p class="lead">
-          A simple guide to what to see, where to stay, what to eat and how much it costs, so you can plan
-          with confidence even if it is your first visit.
-        </p>
-      </div>
-    </header>
-
-    <main class="wrap">
-      <section aria-labelledby="about-title">
-        <h2 id="about-title" class="section-title">What is this website?</h2>
-        <p class="prose">
-          Korea Travel Guide collects the useful basics for a trip to South Korea in one place. Pick a province
-          and you will find famous sights, hotels for every budget, local dishes to try and good restaurants,
-          each with an approximate price in Korean won and US dollars. There is no sign-up and nothing to book here.
-          It is a starting point for your own plan.
-        </p>
-      </section>
-
-      <section aria-labelledby="korea-title">
-        <h2 id="korea-title" class="section-title">About Korea <span class="ko-inline">대한민국</span></h2>
-        <p class="prose">
-          South Korea sits on the Korean Peninsula in East Asia. Its capital, Seoul, is one of the world's
-          great cities, and the country packs a lot into a small area: royal palaces and mountain temples,
-          hiking trails and beaches, volcanic Jeju Island, and modern cities full of neon, cafés and K-pop.
-          Korean food, from barbecue to street snacks, is a reason to visit all by itself.
-        </p>
-        <ul class="facts">
-          <li><strong>Capital</strong>Seoul (서울)</li>
-          <li><strong>Language</strong>Korean, written in Hangul (한글)</li>
-          <li><strong>Currency</strong>Korean won (₩)</li>
-          <li><strong>Seasons</strong>Four distinct seasons. Spring blossoms and autumn leaves are the favorites.</li>
-          <li><strong>Getting around</strong>Fast trains (KTX), subways and buses connect nearly every city.</li>
-        </ul>
-      </section>
-
-      <section aria-labelledby="help-title">
-        <h2 id="help-title" class="section-title">How this site helps you plan</h2>
-        <div class="feature-grid">
-          <article class="feature">
-            <h3>🏯 Attractions <small>관광지</small></h3>
-            <p>Palaces, temples, markets, islands and viewpoints worth your time, with entry prices.</p>
-          </article>
-          <article class="feature">
-            <h3>🛏️ Hotels <small>호텔</small></h3>
-            <p>Luxury, mid-range and budget places to stay, with a typical price per night.</p>
-          </article>
-          <article class="feature">
-            <h3>🍲 Local food <small>먹거리</small></h3>
-            <p>Regional dishes to look for, and what each one usually costs.</p>
-          </article>
-          <article class="feature">
-            <h3>🍽️ Where to eat <small>식당</small></h3>
-            <p>Restaurants to try, with map links so you can find them on Naver Map.</p>
-          </article>
+    <main id="main">
+      <section class="carousel" aria-roledescription="carousel" aria-label="Featured destinations">
+        <div class="slide on" data-slide>
+          <img src="images/hero.svg" alt="" />
+          <div class="copy"><div class="wrap">
+            <p class="kicker">대한민국 여행 가이드</p>
+            <h2>Plan your trip to South Korea</h2>
+            <p class="sub">Palaces, peaks and neon nights. Pick a place, see what it costs and build a plan that fits your budget.</p>
+            <a class="button" href="plan.html">Make a plan →</a>
+          </div></div>
         </div>
+        <div class="slide" data-slide>
+          <img src="images/jeju.svg" alt="" />
+          <div class="copy"><div class="wrap">
+            <p class="kicker">Jeju-do · 제주도</p>
+            <h2>Island escape</h2>
+            <p class="sub">A volcano, lava caves, sunrise craters and tangerines, an hour's flight from Seoul.</p>
+            <a class="button" href="province.html?p=jeju">Explore Jeju →</a>
+          </div></div>
+        </div>
+        <div class="slide" data-slide>
+          <img src="images/gyeongbuk.svg" alt="" />
+          <div class="copy"><div class="wrap">
+            <p class="kicker">Gyeongsangbuk-do · 경상북도</p>
+            <h2>Temples and autumn leaves</h2>
+            <p class="sub">Ancient Silla capital Gyeongju and the living village of Andong.</p>
+            <a class="button" href="province.html?p=gyeongbuk">Explore Gyeongbuk →</a>
+          </div></div>
+        </div>
+        <div class="slide" data-slide>
+          <img src="images/gyeongnam.svg" alt="" />
+          <div class="copy"><div class="wrap">
+            <p class="kicker">Busan · 부산</p>
+            <h2>Harbors and night views</h2>
+            <p class="sub">Beaches, seafood and a skyline that lights up after dark.</p>
+            <a class="button" href="city.html?p=special&c=busan">Visit Busan →</a>
+          </div></div>
+        </div>
+
+        <div class="hero-search"><div class="wrap">
+          <form action="search.html" role="search">
+            <input type="search" name="q" placeholder="Search places, food, hotels or cities" aria-label="Search" />
+            <button type="submit">Search</button>
+          </form>
+        </div></div>
+        <div class="car-ctrl"><div class="wrap">
+          <button type="button" id="prev" aria-label="Previous slide">‹</button>
+          <button type="button" id="next" aria-label="Next slide">›</button>
+          <div class="dots" id="dots"></div>
+        </div></div>
       </section>
 
+      <div class="wrap">
+        <nav class="tiles" aria-label="Quick links">
+          <a class="tile" href="guide.html"><span class="ico">🗺️</span>Provinces<small>도</small></a>
+          <a class="tile" href="hanbando.html"><span class="ico">🏙️</span>Cities and map<small>한반도</small></a>
+          <a class="tile" href="search.html?type=attractions"><span class="ico">🏯</span>Attractions<small>관광지</small></a>
+          <a class="tile" href="search.html?type=restaurants"><span class="ico">🍽️</span>Restaurants<small>맛집</small></a>
+          <a class="tile" href="search.html?type=hotels"><span class="ico">🛏️</span>Places to stay<small>숙소</small></a>
+          <a class="tile" href="plan.html"><span class="ico">🧭</span>Trip planner<small>여행 플래너</small></a>
+        </nav>
 
-      <p class="note">
-        Prices are approximate and change over time. Always confirm opening times, prices and entry
-        requirements before you travel.
-      </p>
+        <div class="section-head">
+          <h2>Travel highlights</h2>
+          <a href="search.html?type=attractions">See all attractions →</a>
+        </div>
+        <div class="card-row" id="highlights"></div>
+
+        <section class="planner-cta" aria-labelledby="cta-title">
+          <div>
+            <h2 id="cta-title">Get a plan that fits your group</h2>
+            <p>Tell us everyone's age, your budget, the places you want to see and how you will travel, including flights. You get three plans to compare and one we recommend.</p>
+          </div>
+          <a class="button" href="plan.html">Start planning →</a>
+        </section>
+
+        <div class="section-head" id="itineraries">
+          <h2>Suggested itineraries</h2>
+          <a href="plan.html">Build your own →</a>
+        </div>
+        <div class="card-row itin">
+          <a class="pcard" href="plan.html?region=gyeonggi&special=Seoul&city=gyeonggi%7CSuwon&days=3&people=2&mode=ktx&go=1">
+            <img src="images/gyeonggi.svg" alt="" loading="lazy" />
+            <div class="body"><p class="tag">3 days · KTX and subway</p><h3>Seoul and Suwon <small>서울 · 수원</small></h3>
+            <p>Royal palaces, hanok lanes and a UNESCO fortress wall, all close together.</p><span class="meta">See this plan →</span></div>
+          </a>
+          <a class="pcard" href="plan.html?region=gyeongbuk&city=gyeongbuk%7CGyeongju&days=3&people=2&mode=ktx&go=1">
+            <img src="images/gyeongbuk.svg" alt="" loading="lazy" />
+            <div class="body"><p class="tag">3 days · KTX and subway</p><h3>Gyeongju heritage getaway <small>경주</small></h3>
+            <p>Temples, royal tombs and a pond that glows at night in the old Silla capital.</p><span class="meta">See this plan →</span></div>
+          </a>
+          <a class="pcard" href="plan.html?region=jeju&days=4&people=2&mode=car&go=1">
+            <img src="images/jeju.svg" alt="" loading="lazy" />
+            <div class="body"><p class="tag">4 days · rental car</p><h3>Jeju island loop <small>제주</small></h3>
+            <p>Waterfalls, lava tubes, a sunrise crater and black pork, by car around the island.</p><span class="meta">See this plan →</span></div>
+          </a>
+        </div>
+
+        <section aria-labelledby="about-title" id="about">
+          <div class="section-head"><h2 id="about-title">Korea at a glance <span class="ko-inline">대한민국</span></h2></div>
+          <p class="prose">
+            South Korea sits on the Korean Peninsula in East Asia. Its capital, Seoul, is one of the world's
+            great cities, and the country packs a lot into a small area: royal palaces and mountain temples,
+            hiking trails and beaches, volcanic Jeju Island, and modern cities full of neon, cafés and K-pop.
+            Korean food, from barbecue to street snacks, is a reason to visit all by itself.
+          </p>
+          <ul class="facts">
+            <li><strong>Capital</strong>Seoul (서울)</li>
+            <li><strong>Language</strong>Korean, written in Hangul (한글)</li>
+            <li><strong>Currency</strong>Korean won (₩)</li>
+            <li><strong>Seasons</strong>Four distinct seasons. Spring blossoms and autumn leaves are the favorites.</li>
+            <li><strong>Getting around</strong>Fast trains (KTX), subways and buses connect nearly every city.</li>
+          </ul>
+          <p class="note">
+            Prices are approximate and change over time. Always confirm opening times, prices and entry
+            requirements before you travel.
+          </p>
+        </section>
+      </div>
     </main>
 
-    <footer class="footer">
-      <div class="wrap">Korea Travel Guide · 한국 여행 가이드</div>
-    </footer>
+    <script src="data.js?v=6"></script>
+    <script src="home.js?v=1"></script>
   </body>
 </html>

@@ -450,6 +450,27 @@ function generate() {
   document.getElementById("print").addEventListener("click", () => window.print());
 }
 
+// Links from other pages can fill in the form, e.g. plan.html?region=jeju&days=4&mode=car&go=1 (go=1 builds the plans straight away).
+function applyPreset() {
+  const q = new URLSearchParams(location.search);
+  if (![...q.keys()].length) return;
+  if (q.has("people")) { form.elements.people.value = q.get("people"); syncAges(); }
+  if (q.has("days")) form.elements.days.value = q.get("days");
+  if (q.has("budget")) form.elements.budget.value = q.get("budget");
+  if (q.has("origin") && q.get("origin") in ORIGINS) form.elements.origin.value = q.get("origin");
+  const mode = form.querySelector(`input[name="mode"][value="${q.get("mode")}"]`);
+  if (mode) mode.checked = true;
+  if (q.has("region") || q.has("special") || q.has("city")) {
+    form.querySelectorAll('input[name="region"], input[name="special"], input[name="city"]').forEach((c) => (c.checked = false));
+    q.getAll("region").forEach((id) => { const c = form.querySelector(`input[name="region"][value="${id}"]`); if (c) c.checked = true; });
+    q.getAll("special").forEach((n) => { const c = form.querySelector(`input[name="special"][value="${n}"]`); if (c) c.checked = true; });
+    q.getAll("city").forEach((v) => { const c = [...form.querySelectorAll('input[name="city"]')].find((i) => i.value === v); if (c) c.checked = true; });
+    syncSubcities();
+  }
+  if (q.get("go") === "1") generate();
+}
+applyPreset();
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   seed = 1;
