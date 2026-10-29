@@ -825,3 +825,93 @@ html {
 .special .city {
   border-left: 4px solid var(--red);
 }
+
+/* ---- City list inside a province (v9) ---- */
+.city-panel {
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.city-panel h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+.city-panel h4 small {
+  padding: 1px 9px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.78rem;
+  border-radius: 999px;
+}
+.city-panel .special-label {
+  margin-top: 14px;
+}
+.city-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.city-chip {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.city-chip small {
+  font-weight: 400;
+  color: var(--muted);
+}
+.city-chip b {
+  margin-left: 4px;
+  padding: 0 7px;
+  font-size: 0.75rem;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+}
+button.city-chip {
+  cursor: pointer;
+  border-color: var(--accent);
+}
+button.city-chip[aria-pressed="true"] {
+  color: #fff;
+  background: var(--accent);
+}
+button.city-chip[aria-pressed="true"] small {
+  color: #eee;
+}
+button.city-chip[aria-pressed="true"] b {
+  color: var(--accent);
+  background: #fff;
+}
+.city-chip.plain {
+  color: var(--muted);
+  background: #f4f1ec;
+}
+.city-clear {
+  margin-left: auto;
+  padding: 3px 12px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--blue);
+  background: none;
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.city-hint {
+  margin: 12px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}

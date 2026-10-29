@@ -8,6 +8,7 @@ const TABS = [
 const grid = document.getElementById("province-grid");
 const detail = document.getElementById("detail");
 let currentTab = "attractions";
+let currentCity = null; // city name chosen in the city list, or null for all
 
 document.getElementById("rate").textContent = KRW_PER_USD.toLocaleString();
 
@@ -47,9 +48,38 @@ function renderGrid(activeId) {
   ).join("");
 }
 
+// Items tagged with a city (e.g. "Changwon (Garosu-gil)") belong to that city.
+const inCity = (it, city) => !!it.city && it.city.startsWith(city.replace(/ \(.*\)/, ""));
+
+function renderCities(p) {
+  const entry = PROVINCE_CITIES.find((c) => c.guide === p.id);
+  if (!entry) return "";
+  const tagged = (name) => TABS.reduce((n, t) => n + (p[t.key] || []).filter((it) => inCity(it, name)).length, 0);
+  const chip = (name, ko) => {
+    const n = tagged(name);
+    const label = `${esc(name.replace(/ \(.*\)/, ""))} <small>${esc(ko)}</small>${n ? ` <b>${n}</b>` : ""}`;
+    return n
+      ? `<button type="button" class="city-chip" data-city="${esc(name)}" aria-pressed="${currentCity === name}">${label}</button>`
+      : `<span class="city-chip plain">${label}</span>`;
+  };
+  const nearby = (entry.nearby || [])
+    .map((n) => SPECIAL_CITIES.find((s) => s.name === n))
+    .filter(Boolean);
+  return `
+    <div class="city-panel" style="--accent:${p.color}">
+      <h4>Cities in ${esc(p.name)} <small>${entry.cities.length}</small>
+        ${currentCity ? `<button type="button" class="city-clear" data-city="">Show all</button>` : ""}</h4>
+      <div class="city-chips">${entry.cities.map(([en, ko]) => chip(en, ko)).join("")}</div>
+      ${nearby.length ? `<h4 class="special-label">Special cities nearby</h4><div class="city-chips">${nearby.map((s) => chip(s.name, s.ko)).join("")}</div>` : ""}
+      <p class="city-hint">Cities with a number have places listed here. Select one to filter.</p>
+    </div>`;
+}
+
 function renderItems(p, key) {
-  const items = p[key] || [];
-  if (items.length === 0) return `<p class="empty">Coming soon.</p>`;
+  const all = p[key] || [];
+  const items = currentCity ? all.filter((it) => inCity(it, currentCity)) : all;
+  if (all.length === 0) return `<p class="empty">Coming soon.</p>`;
+  if (items.length === 0) return `<p class="empty">Nothing listed in ${esc(currentCity)} for this tab yet.</p>`;
   return `<ul class="items">${items
     .map(
       (it) => `
@@ -85,6 +115,7 @@ function renderDetail(p) {
       <p>${esc(p.intro)}</p>
       </div>
     </div>
+    ${renderCities(p)}
     <div class="tabs" role="tablist">
       ${TABS.map(
         (t) => `
@@ -95,6 +126,16 @@ function renderDetail(p) {
     </div>
     <div class="tab-panel" role="tabpanel">${renderItems(p, currentTab)}</div>`;
 
+  detail.querySelectorAll("[data-city]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      currentCity = btn.dataset.city && btn.dataset.city !== currentCity ? btn.dataset.city : null;
+      // Jump to the first tab that has places in this city, so the list is never empty.
+      if (currentCity && !(p[currentTab] || []).some((it) => inCity(it, currentCity))) {
+        currentTab = TABS.find((t) => (p[t.key] || []).some((it) => inCity(it, currentCity)))?.key ?? currentTab;
+      }
+      renderDetail(p);
+    })
+  );
   detail.querySelectorAll("[data-tab]").forEach((btn) =>
     btn.addEventListener("click", () => {
       currentTab = btn.dataset.tab;
@@ -114,6 +155,7 @@ function route() {
 
 window.addEventListener("hashchange", () => {
   currentTab = "attractions";
+  currentCity = null;
   route();
 });
 route();
